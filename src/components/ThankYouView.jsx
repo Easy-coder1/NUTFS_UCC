@@ -97,7 +97,7 @@ export const ThankYouView = ({ submittedData, onReset }) => {
                 <span className="font-medium text-slate-800">
                   {submittedData.residenceType === 'Hall'
                     ? `Room ${submittedData.roomNumber}`
-                    : 'Hostel Resident'}
+                    : (submittedData.hostelName ? `Hostel: ${submittedData.hostelName}` : 'Hostel Resident')}
                 </span>
               </div>
             </div>
