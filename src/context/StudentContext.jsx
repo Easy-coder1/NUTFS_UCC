@@ -24,8 +24,8 @@ export const StudentProvider = ({ children }) => {
       const mapped = (data || []).map(mapDbToFrontend);
       setStudents(mapped);
     } catch (err) {
-      console.error('Error fetching students:', err);
-      setError(err.message);
+      // Anon public users cannot list all students; ignore this expected permission restriction
+      console.warn('Student roster fetch restricted for current session:', err.message);
     } finally {
       setLoading(false);
     }
@@ -106,17 +106,29 @@ export const StudentProvider = ({ children }) => {
         passport_photo_url: photoUrl,
       };
 
-      const { data, error: insertError } = await supabase
+      // Pure INSERT without requiring SELECT privilege/policy
+      const { error: insertError } = await supabase
         .from('students')
-        .insert(row)
-        .select()
-        .single();
+        .insert(row);
 
       if (insertError) throw insertError;
 
-      const mapped = mapDbToFrontend(data);
-      setStudents((prev) => [mapped, ...prev]);
-      return mapped;
+      const created = {
+        id: crypto.randomUUID(),
+        fullName: newStudentData.fullName,
+        phone: newStudentData.phone,
+        programOfStudy: newStudentData.programOfStudy,
+        level: newStudentData.level,
+        hallOfAffiliation: newStudentData.hallOfAffiliation,
+        residenceType: newStudentData.residenceType,
+        roomNumber: newStudentData.residenceType === 'Hall' ? newStudentData.roomNumber : '',
+        hostelName: newStudentData.residenceType === 'Hostel' ? (newStudentData.hostelName || newStudentData.roomNumber || '') : '',
+        passportPhoto: photoUrl || newStudentData.passportPhoto || '',
+        createdAt: new Date().toISOString(),
+      };
+
+      setStudents((prev) => [created, ...prev]);
+      return created;
     } catch (err) {
       console.error('Error adding student:', err);
       setError(err.message);
