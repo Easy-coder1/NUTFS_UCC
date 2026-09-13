@@ -143,7 +143,7 @@ export const RegistrationForm = ({ onSuccess }) => {
         ? formData.programName.trim()
         : `${formData.degreeType} ${formData.programName.trim()}`;
 
-      const fullName = `${formData.lastName.trim()} ${formData.firstName.trim()}`;
+      const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
 
       const created = await addStudent({
         fullName,
@@ -572,12 +572,12 @@ export const RegistrationForm = ({ onSuccess }) => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Processing Registration...</span>
+                  <span>Registering...</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>Submit Official Registration</span>
+                  <span>Register</span>
                 </>
               )}
             </button>
