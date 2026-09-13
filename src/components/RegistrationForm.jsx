@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { HALLS_OF_AFFILIATION, LEVELS } from '../constants/data';
 import { useStudents } from '../context/StudentContext';
 import { 
-  User, 
   Upload, 
   Send, 
   AlertCircle, 
@@ -136,358 +135,304 @@ export const RegistrationForm = ({ onSuccess }) => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 md:px-6 pb-16 pt-2">
-      {/* Page Header */}
-      <div className="mb-8 border-b border-slate-200 pb-5">
+    <div className="w-full max-w-2xl mx-auto px-4 md:px-6 pb-16 pt-4">
+      {/* Header */}
+      <div className="mb-8 border-b border-slate-200 pb-5 text-center">
         <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
-          Member Registration
+          NUTFS UCC Member Registration
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           Complete the form below to register with the NUTFS UCC fellowship community.
         </p>
       </div>
 
-      {/* Main Grid: Form (Left) + Live Preview Card (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Form Column */}
-        <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-xs p-6 md:p-7">
-          <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            {/* Section 1: Personal & Academic Info */}
-            <div className="space-y-4">
-              <h2 className="text-base font-semibold text-slate-900 pb-2 border-b border-slate-100">
-                Personal & Academic Details
-              </h2>
+      {/* Form Container */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 md:p-8">
+        <form onSubmit={handleSubmit} noValidate className="space-y-6">
+          {/* Section 1: Personal & Academic Info */}
+          <div className="space-y-4">
+            <h2 className="text-base font-semibold text-slate-900 pb-2 border-b border-slate-100">
+              Personal & Academic Details
+            </h2>
 
-              {/* Full Name */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  placeholder="e.g. Kwame Mensah"
-                  className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                    errors.fullName
-                      ? 'border-red-500 bg-red-50/30 focus:border-red-500'
-                      : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
-                  }`}
-                />
-                {errors.fullName && (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.fullName}
-                  </p>
-                )}
-              </div>
-
-              {/* Phone Number */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Phone Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="e.g. 0541234567"
-                  className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                    errors.phone
-                      ? 'border-red-500 bg-red-50/30 focus:border-red-500'
-                      : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
-                  }`}
-                />
-                {errors.phone && (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.phone}
-                  </p>
-                )}
-              </div>
-
-              {/* Program of Study */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Program of Study <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.programOfStudy}
-                  onChange={(e) => handleInputChange('programOfStudy', e.target.value)}
-                  placeholder="e.g. BSc. Computer Science"
-                  className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                    errors.programOfStudy
-                      ? 'border-red-500 bg-red-50/30 focus:border-red-500'
-                      : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
-                  }`}
-                />
-                {errors.programOfStudy && (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.programOfStudy}
-                  </p>
-                )}
-              </div>
-
-              {/* Level of Study */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                  Level of Study <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {LEVELS.map((lvl) => {
-                    const isSelected = formData.level === lvl;
-                    return (
-                      <button
-                        key={lvl}
-                        type="button"
-                        onClick={() => handleInputChange('level', lvl)}
-                        className={`py-2 px-3 rounded-lg border text-xs font-medium transition-colors ${
-                          isSelected
-                            ? 'bg-slate-900 text-white border-slate-900'
-                            : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        Level {lvl}
-                      </button>
-                    );
-                  })}
-                </div>
-                {errors.level && (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.level}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Section 2: Residential Details */}
-            <div className="space-y-4 pt-2">
-              <h2 className="text-base font-semibold text-slate-900 pb-2 border-b border-slate-100">
-                Residential Information
-              </h2>
-
-              {/* Hall of Affiliation */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Hall of Affiliation <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.hallOfAffiliation}
-                  onChange={(e) => handleInputChange('hallOfAffiliation', e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                >
-                  {HALLS_OF_AFFILIATION.map((hall) => (
-                    <option key={hall} value={hall}>
-                      {hall}
-                    </option>
-                  ))}
-                </select>
-                {errors.hallOfAffiliation && (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.hallOfAffiliation}
-                  </p>
-                )}
-              </div>
-
-              {/* Residence Type Radio */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                  Residence Type <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label
-                    className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      formData.residenceType === 'Hall'
-                        ? 'bg-slate-50 border-slate-900 text-slate-900'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="residenceType"
-                      value="Hall"
-                      checked={formData.residenceType === 'Hall'}
-                      onChange={() => handleInputChange('residenceType', 'Hall')}
-                      className="accent-slate-900"
-                    />
-                    <div>
-                      <p className="text-xs font-medium">Hall Resident</p>
-                      <p className="text-[11px] text-slate-400">On campus hall</p>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      formData.residenceType === 'Hostel'
-                        ? 'bg-slate-50 border-slate-900 text-slate-900'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="residenceType"
-                      value="Hostel"
-                      checked={formData.residenceType === 'Hostel'}
-                      onChange={() => handleInputChange('residenceType', 'Hostel')}
-                      className="accent-slate-900"
-                    />
-                    <div>
-                      <p className="text-xs font-medium">Hostel</p>
-                      <p className="text-[11px] text-slate-400">Off campus hostel</p>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Room Number */}
-              {formData.residenceType === 'Hall' && (
-                <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Room Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.roomNumber}
-                    onChange={(e) => handleInputChange('roomNumber', e.target.value)}
-                    placeholder="e.g. C34"
-                    className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                      errors.roomNumber
-                        ? 'border-red-500 bg-red-50/30 focus:border-red-500'
-                        : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
-                    }`}
-                  />
-                  {errors.roomNumber && (
-                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" /> {errors.roomNumber}
-                    </p>
-                  )}
-                </div>
+            {/* Full Name */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.fullName}
+                onChange={(e) => handleInputChange('fullName', e.target.value)}
+                placeholder="e.g. Kwame Mensah"
+                className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                  errors.fullName
+                    ? 'border-red-500 bg-red-50/30 focus:border-red-500'
+                    : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
+                }`}
+              />
+              {errors.fullName && (
+                <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.fullName}
+                </p>
               )}
             </div>
 
-            {/* Section 3: Passport Photo */}
-            <div className="space-y-3 pt-2">
-              <h2 className="text-base font-semibold text-slate-900 pb-2 border-b border-slate-100">
-                Passport Photo
-              </h2>
+            {/* Phone Number */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="e.g. 0541234567"
+                className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                  errors.phone
+                    ? 'border-red-500 bg-red-50/30 focus:border-red-500'
+                    : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
+                }`}
+              />
+              {errors.phone && (
+                <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.phone}
+                </p>
+              )}
+            </div>
 
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border border-dashed border-slate-300 hover:border-slate-400 rounded-lg p-5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50"
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-                {photoPreview ? (
-                  <div className="relative group">
-                    <img
-                      src={photoPreview}
-                      alt="Student Preview"
-                      className="w-24 h-24 object-cover rounded-lg border border-slate-300 shadow-xs"
-                    />
+            {/* Program of Study */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Program of Study <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.programOfStudy}
+                onChange={(e) => handleInputChange('programOfStudy', e.target.value)}
+                placeholder="e.g. BSc. Computer Science"
+                className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                  errors.programOfStudy
+                    ? 'border-red-500 bg-red-50/30 focus:border-red-500'
+                    : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
+                }`}
+              />
+              {errors.programOfStudy && (
+                <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.programOfStudy}
+                </p>
+              )}
+            </div>
+
+            {/* Level of Study */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                Level of Study <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {LEVELS.map((lvl) => {
+                  const isSelected = formData.level === lvl;
+                  return (
                     <button
+                      key={lvl}
                       type="button"
-                      onClick={removePhoto}
-                      className="absolute -top-2 -right-2 bg-slate-800 text-white p-1 rounded-full shadow hover:bg-slate-900 transition-colors"
-                      title="Remove Photo"
+                      onClick={() => handleInputChange('level', lvl)}
+                      className={`py-2 px-3 rounded-lg border text-xs font-medium transition-colors ${
+                        isSelected
+                          ? 'bg-slate-900 text-white border-slate-900'
+                          : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                      }`}
                     >
-                      <X className="w-3.5 h-3.5" />
+                      Level {lvl}
                     </button>
-                  </div>
-                ) : (
-                  <div className="text-center space-y-1">
-                    <Upload className="w-5 h-5 text-slate-400 mx-auto mb-1" />
-                    <p className="text-xs font-medium text-slate-700">Click to upload photo</p>
-                    <p className="text-[11px] text-slate-400">JPG or PNG up to 5MB</p>
-                  </div>
-                )}
+                  );
+                })}
               </div>
-            </div>
-
-            {/* Submit Error */}
-            {submitError && (
-              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-start gap-2 text-xs">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{submitError}</span>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Submitting...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span>Submit Registration</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Live Preview Card (Right Column) */}
-        <div className="lg:col-span-5 sticky top-20">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
-            <div className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">
-              Card Preview
-            </div>
-
-            <div className="p-4 rounded-lg bg-slate-50 border border-slate-200/80 space-y-3">
-              <div className="flex items-start gap-3.5">
-                <div className="w-16 h-16 rounded-lg border border-slate-200 overflow-hidden bg-white shrink-0 flex items-center justify-center">
-                  {photoPreview ? (
-                    <img
-                      src={photoPreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-7 h-7 text-slate-300" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-semibold text-slate-900 truncate">
-                    {formData.fullName || 'Student Full Name'}
-                  </h4>
-                  <p className="text-xs text-slate-600 truncate mt-0.5">
-                    {formData.programOfStudy || 'Programme of Study'}
-                  </p>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Level {formData.level} • {formData.phone || 'Phone Number'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-200/80 text-xs">
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">Hall</span>
-                  <span className="text-slate-800 font-medium">{formData.hallOfAffiliation}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 block font-medium">Residence</span>
-                  <span className="text-slate-800 font-medium">
-                    {formData.residenceType === 'Hall'
-                      ? `Room ${formData.roomNumber || '—'}`
-                      : 'Hostel Resident'}
-                  </span>
-                </div>
-              </div>
+              {errors.level && (
+                <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.level}
+                </p>
+              )}
             </div>
           </div>
-        </div>
+
+          {/* Section 2: Residential Details */}
+          <div className="space-y-4 pt-2">
+            <h2 className="text-base font-semibold text-slate-900 pb-2 border-b border-slate-100">
+              Residential Information
+            </h2>
+
+            {/* Hall of Affiliation */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Hall of Affiliation <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.hallOfAffiliation}
+                onChange={(e) => handleInputChange('hallOfAffiliation', e.target.value)}
+                className="w-full px-3.5 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              >
+                {HALLS_OF_AFFILIATION.map((hall) => (
+                  <option key={hall} value={hall}>
+                    {hall}
+                  </option>
+                ))}
+              </select>
+              {errors.hallOfAffiliation && (
+                <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" /> {errors.hallOfAffiliation}
+                </p>
+              )}
+            </div>
+
+            {/* Residence Type Radio */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                Residence Type <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label
+                  className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    formData.residenceType === 'Hall'
+                      ? 'bg-slate-50 border-slate-900 text-slate-900'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="residenceType"
+                    value="Hall"
+                    checked={formData.residenceType === 'Hall'}
+                    onChange={() => handleInputChange('residenceType', 'Hall')}
+                    className="accent-slate-900"
+                  />
+                  <div>
+                    <p className="text-xs font-medium">Hall Resident</p>
+                    <p className="text-[11px] text-slate-400">On campus hall</p>
+                  </div>
+                </label>
+
+                <label
+                  className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    formData.residenceType === 'Hostel'
+                      ? 'bg-slate-50 border-slate-900 text-slate-900'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="residenceType"
+                    value="Hostel"
+                    checked={formData.residenceType === 'Hostel'}
+                    onChange={() => handleInputChange('residenceType', 'Hostel')}
+                    className="accent-slate-900"
+                  />
+                  <div>
+                    <p className="text-xs font-medium">Hostel</p>
+                    <p className="text-[11px] text-slate-400">Off campus hostel</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Room Number */}
+            {formData.residenceType === 'Hall' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Room Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.roomNumber}
+                  onChange={(e) => handleInputChange('roomNumber', e.target.value)}
+                  placeholder="e.g. C34"
+                  className={`w-full px-3.5 py-2 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                    errors.roomNumber
+                      ? 'border-red-500 bg-red-50/30 focus:border-red-500'
+                      : 'border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary'
+                  }`}
+                />
+                {errors.roomNumber && (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.roomNumber}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Section 3: Passport Photo */}
+          <div className="space-y-3 pt-2">
+            <h2 className="text-base font-semibold text-slate-900 pb-2 border-b border-slate-100">
+              Passport Photo
+            </h2>
+
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border border-dashed border-slate-300 hover:border-slate-400 rounded-lg p-5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50"
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              {photoPreview ? (
+                <div className="relative group">
+                  <img
+                    src={photoPreview}
+                    alt="Student Preview"
+                    className="w-24 h-24 object-cover rounded-lg border border-slate-300 shadow-xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={removePhoto}
+                    className="absolute -top-2 -right-2 bg-slate-800 text-white p-1 rounded-full shadow hover:bg-slate-900 transition-colors"
+                    title="Remove Photo"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center space-y-1">
+                  <Upload className="w-5 h-5 text-slate-400 mx-auto mb-1" />
+                  <p className="text-xs font-medium text-slate-700">Click to upload photo</p>
+                  <p className="text-[11px] text-slate-400">JPG or PNG up to 5MB</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Error */}
+          {submitError && (
+            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-start gap-2 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{submitError}</span>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-5 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900/20 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>Submit Registration</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
