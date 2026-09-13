@@ -1,16 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { HALLS_OF_AFFILIATION, LEVELS } from '../constants/data';
+import { HALLS_OF_AFFILIATION, LEVELS, DEGREE_TYPES } from '../constants/data';
 import { useStudents } from '../context/StudentContext';
 import { 
   Upload, 
   Send, 
   AlertCircle, 
-  X,
+  X, 
   Loader2,
   ShieldCheck,
   CheckSquare,
-  Square,
-  Info
+  Square
 } from 'lucide-react';
 
 export const RegistrationForm = ({ onSuccess }) => {
@@ -20,7 +19,8 @@ export const RegistrationForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
-    programOfStudy: '',
+    degreeType: DEGREE_TYPES[0],
+    programName: '',
     level: '100',
     hallOfAffiliation: HALLS_OF_AFFILIATION[0],
     residenceType: 'Hall', // 'Hall' | 'Hostel'
@@ -95,8 +95,8 @@ export const RegistrationForm = ({ onSuccess }) => {
       newErrors.phone = 'Please enter a valid telephone number.';
     }
 
-    if (!formData.programOfStudy.trim()) {
-      newErrors.programOfStudy = 'Program of study is required.';
+    if (!formData.programName.trim()) {
+      newErrors.programName = 'Program of study is required.';
     }
 
     if (!formData.level) {
@@ -132,10 +132,14 @@ export const RegistrationForm = ({ onSuccess }) => {
     setIsSubmitting(true);
     setSubmitError('');
     try {
+      const fullProgram = formData.degreeType === 'Other'
+        ? formData.programName.trim()
+        : `${formData.degreeType} ${formData.programName.trim()}`;
+
       const created = await addStudent({
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),
-        programOfStudy: formData.programOfStudy.trim(),
+        programOfStudy: fullProgram,
         level: formData.level,
         hallOfAffiliation: formData.hallOfAffiliation,
         residenceType: formData.residenceType,
@@ -162,11 +166,11 @@ export const RegistrationForm = ({ onSuccess }) => {
             <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider block">
               National Union of Teshie Fellowship Students
             </span>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
-              Official Member Registration Form
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-0.5">
+              NUTFS UCC Member Registration
             </h1>
             <p className="text-xs text-slate-300 mt-1">
-              University of Cape Coast Chapter • Academic Records Department
+              Official Membership Portal • University of Cape Coast Chapter
             </p>
           </div>
           <div className="shrink-0 pt-2 sm:pt-0">
@@ -180,17 +184,6 @@ export const RegistrationForm = ({ onSuccess }) => {
 
       {/* Form Container */}
       <div className="bg-white rounded-b-xl border border-slate-200 border-t-0 shadow-sm p-6 sm:p-8 space-y-8">
-        {/* Important Notice */}
-        <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-slate-800 text-xs">
-          <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-slate-900 block mb-0.5">Notice to All Applicants:</span>
-            <span>
-              Please ensure all details entered below match your official University of Cape Coast student records. Fields marked with an asterisk (<span className="text-red-600 font-bold">*</span>) are mandatory.
-            </span>
-          </div>
-        </div>
-
         <form onSubmit={handleSubmit} noValidate className="space-y-8">
           {/* SECTION 1: Personal & Academic Profile */}
           <div className="space-y-4">
@@ -250,25 +243,42 @@ export const RegistrationForm = ({ onSuccess }) => {
                 )}
               </div>
 
-              {/* Program of Study */}
-              <div className="sm:col-span-2">
+              {/* Degree Type & Program of Study */}
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Degree Type <span className="text-red-600">*</span>
+                </label>
+                <select
+                  value={formData.degreeType}
+                  onChange={(e) => handleInputChange('degreeType', e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 focus:outline-none focus:border-slate-900"
+                >
+                  {DEGREE_TYPES.map((deg) => (
+                    <option key={deg} value={deg}>
+                      {deg}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="sm:col-span-1">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Program of Study <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.programOfStudy}
-                  onChange={(e) => handleInputChange('programOfStudy', e.target.value)}
-                  placeholder="e.g. Bachelor of Science in Computer Science"
+                  value={formData.programName}
+                  onChange={(e) => handleInputChange('programName', e.target.value)}
+                  placeholder="e.g. Computer Science, Accounting"
                   className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                    errors.programOfStudy
+                    errors.programName
                       ? 'border-red-500 bg-red-50/20 focus:border-red-500'
                       : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
                   }`}
                 />
-                {errors.programOfStudy && (
+                {errors.programName && (
                   <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.programOfStudy}
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.programName}
                   </p>
                 )}
               </div>
@@ -313,7 +323,7 @@ export const RegistrationForm = ({ onSuccess }) => {
                 2
               </span>
               <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                Residential & Accommodation Data
+                Residential
               </h2>
             </div>
 
