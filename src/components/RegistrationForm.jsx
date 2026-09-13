@@ -206,29 +206,6 @@ export const RegistrationForm = ({ onSuccess }) => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Last Name */}
-              <div className="sm:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Last Name (Surname) <span className="text-red-600">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  placeholder="e.g. Mensah"
-                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                    errors.lastName
-                      ? 'border-red-500 bg-red-50/20 focus:border-red-500'
-                      : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
-                  }`}
-                />
-                {errors.lastName && (
-                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.lastName}
-                  </p>
-                )}
-              </div>
-
               {/* First Name */}
               <div className="sm:col-span-1">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -248,6 +225,29 @@ export const RegistrationForm = ({ onSuccess }) => {
                 {errors.firstName && (
                   <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.firstName}
+                  </p>
+                )}
+              </div>
+
+              {/* Last Name */}
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Last Name (Surname) <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  placeholder="e.g. Mensah"
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                    errors.lastName
+                      ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                      : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                  }`}
+                />
+                {errors.lastName && (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.lastName}
                   </p>
                 )}
               </div>
