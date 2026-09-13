@@ -4,7 +4,6 @@ import { StudentProvider } from './context/StudentContext';
 import { Sidebar } from './components/Sidebar';
 import { RegistrationForm } from './components/RegistrationForm';
 import { ThankYouView } from './components/ThankYouView';
-import { AdminDashboard } from './components/AdminDashboard';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState('register');
@@ -22,18 +21,10 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleViewDashboard = () => {
-    setActiveTab('dashboard');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Top Header Navigation */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <Sidebar />
 
       {/* Main Content Area */}
       <main className="flex-1">
@@ -45,12 +36,7 @@ function AppContent() {
           <ThankYouView
             submittedData={submittedData}
             onReset={handleReset}
-            onViewDashboard={handleViewDashboard}
           />
-        )}
-
-        {activeTab === 'dashboard' && (
-          <AdminDashboard />
         )}
       </main>
 

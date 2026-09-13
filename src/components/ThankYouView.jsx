@@ -3,11 +3,10 @@ import {
   CheckCircle2, 
   Printer, 
   UserPlus, 
-  LayoutDashboard, 
   User 
 } from 'lucide-react';
 
-export const ThankYouView = ({ submittedData, onReset, onViewDashboard }) => {
+export const ThankYouView = ({ submittedData, onReset }) => {
   const handlePrint = () => {
     window.print();
   };
@@ -111,21 +110,13 @@ export const ThankYouView = ({ submittedData, onReset, onViewDashboard }) => {
       </div>
 
       {/* Trailing Actions */}
-      <div className="flex flex-wrap justify-between items-center gap-3 no-print">
+      <div className="flex justify-center items-center gap-3 no-print">
         <button
           onClick={onReset}
-          className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-50 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-medium hover:bg-slate-800 transition-colors"
         >
           <UserPlus className="w-3.5 h-3.5" />
-          <span>Register Another</span>
-        </button>
-
-        <button
-          onClick={onViewDashboard}
-          className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-medium hover:bg-slate-800 transition-colors"
-        >
-          <LayoutDashboard className="w-3.5 h-3.5" />
-          <span>Admin Dashboard</span>
+          <span>Register Another Member</span>
         </button>
       </div>
     </div>
