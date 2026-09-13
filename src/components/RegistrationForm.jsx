@@ -17,7 +17,8 @@ export const RegistrationForm = ({ onSuccess }) => {
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     degreeType: DEGREE_TYPES[0],
     programName: '',
@@ -83,10 +84,16 @@ export const RegistrationForm = ({ onSuccess }) => {
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full Name is required.';
-    } else if (formData.fullName.trim().length < 3) {
-      newErrors.fullName = 'Full Name must be at least 3 characters.';
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required.';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'First name must be at least 2 characters.';
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required.';
+    } else if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = 'Last name must be at least 2 characters.';
     }
 
     if (!formData.phone.trim()) {
@@ -136,8 +143,10 @@ export const RegistrationForm = ({ onSuccess }) => {
         ? formData.programName.trim()
         : `${formData.degreeType} ${formData.programName.trim()}`;
 
+      const fullName = `${formData.lastName.trim()} ${formData.firstName.trim()}`;
+
       const created = await addStudent({
-        fullName: formData.fullName.trim(),
+        fullName,
         phone: formData.phone.trim(),
         programOfStudy: fullProgram,
         level: formData.level,
@@ -197,25 +206,48 @@ export const RegistrationForm = ({ onSuccess }) => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Full Name */}
+              {/* Last Name */}
               <div className="sm:col-span-1">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Full Name (Surname First) <span className="text-red-600">*</span>
+                  Last Name (Surname) <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.fullName}
-                  onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  placeholder="e.g. Mensah, Kwame"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  placeholder="e.g. Mensah"
                   className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
-                    errors.fullName
+                    errors.lastName
                       ? 'border-red-500 bg-red-50/20 focus:border-red-500'
                       : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
                   }`}
                 />
-                {errors.fullName && (
+                {errors.lastName && (
                   <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" /> {errors.fullName}
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.lastName}
+                  </p>
+                )}
+              </div>
+
+              {/* First Name */}
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  First Name <span className="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  placeholder="e.g. Kwame"
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                    errors.firstName
+                      ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                      : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                  }`}
+                />
+                {errors.firstName && (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.firstName}
                   </p>
                 )}
               </div>
