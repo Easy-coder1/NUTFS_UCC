@@ -162,7 +162,7 @@ export const RegistrationForm = ({ onSuccess }) => {
             <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider block">
               National Union of Teshie Fellowship Students
             </span>
-            <h1 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight mt-0.5">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
               Official Member Registration Form
             </h1>
             <p className="text-xs text-slate-300 mt-1">
@@ -198,7 +198,7 @@ export const RegistrationForm = ({ onSuccess }) => {
               <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">
                 1
               </span>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 font-serif">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
                 Personal & Academic Profile
               </h2>
             </div>
@@ -312,7 +312,7 @@ export const RegistrationForm = ({ onSuccess }) => {
               <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">
                 2
               </span>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 font-serif">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
                 Residential & Accommodation Data
               </h2>
             </div>
@@ -443,7 +443,7 @@ export const RegistrationForm = ({ onSuccess }) => {
               <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">
                 3
               </span>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900 font-serif">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
                 Passport Photograph Upload
               </h2>
             </div>

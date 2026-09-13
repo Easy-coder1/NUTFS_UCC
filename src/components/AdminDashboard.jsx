@@ -95,7 +95,7 @@ export const AdminDashboard = () => {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
             Admin Dashboard
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -135,17 +135,17 @@ export const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl p-4 border border-slate-200">
           <p className="text-xs font-medium text-slate-500">Total Members</p>
-          <p className="text-2xl font-bold font-serif text-slate-900 mt-1">{students.length}</p>
+          <p className="text-2xl font-bold text-slate-900 mt-1">{students.length}</p>
         </div>
 
         <div className="bg-white rounded-xl p-4 border border-slate-200">
           <p className="text-xs font-medium text-slate-500">Hall Residents</p>
-          <p className="text-2xl font-bold font-serif text-slate-900 mt-1">{hallResidentsCount}</p>
+          <p className="text-2xl font-bold text-slate-900 mt-1">{hallResidentsCount}</p>
         </div>
 
         <div className="bg-white rounded-xl p-4 border border-slate-200">
           <p className="text-xs font-medium text-slate-500">Hostel Residents</p>
-          <p className="text-2xl font-bold font-serif text-slate-900 mt-1">{hostelResidentsCount}</p>
+          <p className="text-2xl font-bold text-slate-900 mt-1">{hostelResidentsCount}</p>
         </div>
       </div>
 

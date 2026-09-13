@@ -38,8 +38,7 @@ export default {
         "on-error-container": "#991b1b",
       },
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "Inter", "system-ui", "-apple-system", "sans-serif"],
-        serif: ["Playfair Display", "Georgia", "serif"],
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "0.5rem",

@@ -54,7 +54,7 @@ export const ThankYouView = ({ submittedData, onReset }) => {
       <div className="bg-white rounded-xl border border-slate-200 p-6 md:p-7 printable-slip space-y-5">
         <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
           <div>
-            <h1 className="text-base font-serif font-bold text-slate-900">
+            <h1 className="text-base font-bold text-slate-900">
               NUTFS UCC Member Slip
             </h1>
             <p className="text-xs text-slate-500">
