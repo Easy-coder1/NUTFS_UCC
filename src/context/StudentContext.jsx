@@ -102,7 +102,7 @@ export const StudentProvider = ({ children }) => {
         level: newStudentData.level,
         hall_of_affiliation: newStudentData.hallOfAffiliation,
         residence_type: newStudentData.residenceType,
-        room_number: newStudentData.residenceType === 'Hall' ? newStudentData.roomNumber : '',
+        room_number: newStudentData.residenceType === 'Hall' ? newStudentData.roomNumber : (newStudentData.hostelName || newStudentData.roomNumber || ''),
         passport_photo_url: photoUrl,
       };
 
@@ -223,7 +223,8 @@ function mapDbToFrontend(row) {
     level: row.level,
     hallOfAffiliation: row.hall_of_affiliation,
     residenceType: row.residence_type,
-    roomNumber: row.room_number || '',
+    roomNumber: row.residence_type === 'Hall' ? (row.room_number || '') : '',
+    hostelName: row.residence_type === 'Hostel' ? (row.room_number || '') : '',
     passportPhoto: row.passport_photo_url || '',
     createdAt: row.created_at,
   };

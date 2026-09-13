@@ -1,24 +1,16 @@
 import React, { useState, useRef } from 'react';
-
 import { HALLS_OF_AFFILIATION, LEVELS } from '../constants/data';
 import { useStudents } from '../context/StudentContext';
 import { 
-  User, 
-  Phone, 
-  BookOpen, 
-  GraduationCap, 
-  Home, 
-  Camera, 
   Upload, 
   Send, 
   AlertCircle, 
-  CheckCircle2,
   X,
-  Sparkles,
-  Church,
+  Loader2,
   ShieldCheck,
-  Building2,
-  IdCard
+  CheckSquare,
+  Square,
+  Info
 } from 'lucide-react';
 
 export const RegistrationForm = ({ onSuccess }) => {
@@ -33,10 +25,12 @@ export const RegistrationForm = ({ onSuccess }) => {
     hallOfAffiliation: HALLS_OF_AFFILIATION[0],
     residenceType: 'Hall', // 'Hall' | 'Hostel'
     roomNumber: '',
+    hostelName: '',
     passportPhoto: '',
-    passportPhotoFile: null // Raw File object for Supabase Storage upload
+    passportPhotoFile: null
   });
 
+  const [isDeclared, setIsDeclared] = useState(false);
   const [errors, setErrors] = useState({});
   const [photoPreview, setPhotoPreview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,14 +39,16 @@ export const RegistrationForm = ({ onSuccess }) => {
   const handleInputChange = (field, value) => {
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
-      // Reactive state logic: if residenceType is changed to Hostel, clear roomNumber
-      if (field === 'residenceType' && value === 'Hostel') {
-        updated.roomNumber = '';
+      if (field === 'residenceType') {
+        if (value === 'Hostel') {
+          updated.roomNumber = '';
+        } else if (value === 'Hall') {
+          updated.hostelName = '';
+        }
       }
       return updated;
     });
 
-    // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
     }
@@ -65,7 +61,6 @@ export const RegistrationForm = ({ onSuccess }) => {
         setErrors((prev) => ({ ...prev, passportPhoto: 'File size must be under 5MB.' }));
         return;
       }
-      // Use object URL for instant preview; store raw File for Supabase upload
       const previewUrl = URL.createObjectURL(file);
       setPhotoPreview(previewUrl);
       setFormData((prev) => ({ ...prev, passportPhoto: previewUrl, passportPhotoFile: file }));
@@ -97,7 +92,7 @@ export const RegistrationForm = ({ onSuccess }) => {
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required.';
     } else if (!/^[\d\s+\-()]{9,15}$/.test(formData.phone.trim())) {
-      newErrors.phone = 'Please enter a valid phone number (e.g. 0541234567).';
+      newErrors.phone = 'Please enter a valid telephone number.';
     }
 
     if (!formData.programOfStudy.trim()) {
@@ -105,7 +100,7 @@ export const RegistrationForm = ({ onSuccess }) => {
     }
 
     if (!formData.level) {
-      newErrors.level = 'Please select your level.';
+      newErrors.level = 'Please select your academic level.';
     }
 
     if (!formData.hallOfAffiliation) {
@@ -113,7 +108,15 @@ export const RegistrationForm = ({ onSuccess }) => {
     }
 
     if (formData.residenceType === 'Hall' && !formData.roomNumber.trim()) {
-      newErrors.roomNumber = 'Room number is required when residing in a Hall.';
+      newErrors.roomNumber = 'Room number is required for Hall residents.';
+    }
+
+    if (formData.residenceType === 'Hostel' && !formData.hostelName.trim()) {
+      newErrors.hostelName = 'Hostel name is required for Hostel residents.';
+    }
+
+    if (!isDeclared) {
+      newErrors.declaration = 'You must certify the declaration before submitting.';
     }
 
     setErrors(newErrors);
@@ -137,166 +140,143 @@ export const RegistrationForm = ({ onSuccess }) => {
         hallOfAffiliation: formData.hallOfAffiliation,
         residenceType: formData.residenceType,
         roomNumber: formData.residenceType === 'Hall' ? formData.roomNumber.trim() : '',
+        hostelName: formData.residenceType === 'Hostel' ? formData.hostelName.trim() : '',
         passportPhoto: formData.passportPhoto,
         passportPhotoFile: formData.passportPhotoFile
       });
       onSuccess(created);
     } catch (err) {
       console.error('Registration error:', err);
-      setSubmitError(err.message || 'Registration failed. Please try again.');
+      setSubmitError(err.message || 'Registration submission failed. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Quick fill helper to demonstrate the registration seamlessly to professors
-  const handleQuickDemoFill = () => {
-    const demoStudent = {
-      fullName: "Kwame Asante Mensah",
-      phone: "0548923451",
-      programOfStudy: "BSc. Computer Science",
-      level: "300",
-      hallOfAffiliation: "Casely Hayford Hall",
-      residenceType: "Hall",
-      roomNumber: "C34",
-      passportPhoto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
-      passportPhotoFile: null
-    };
-    setFormData(demoStudent);
-    setPhotoPreview(demoStudent.passportPhoto);
-    setErrors({});
-    setSubmitError('');
-  };
-
   return (
-    <div className="w-full max-w-container-max mx-auto px-4 md:px-8 pb-16">
-      {/* Page Header */}
-      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-outline-variant/60 pb-5">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary">
-              Member Registration
+    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      {/* Official Page Banner */}
+      <div className="mb-6 bg-slate-900 text-white rounded-t-xl p-6 border-b-4 border-amber-500 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider block">
+              National Union of Teshie Fellowship Students
             </span>
-            <span className="text-xs text-on-surface-variant">
-              University of Cape Coast Chapter
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
+              Official Member Registration Form
+            </h1>
+            <p className="text-xs text-slate-300 mt-1">
+              University of Cape Coast Chapter • Academic Records Department
+            </p>
+          </div>
+          <div className="shrink-0 pt-2 sm:pt-0">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono bg-white/10 text-slate-200 border border-white/15">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              Secure Registration
             </span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold font-serif text-primary tracking-tight">
-            Student Registration Form
-          </h1>
-          <p className="text-xs md:text-sm text-on-surface-variant mt-1">
-            Join the NUTFS UCC Digital Sanctuary fellowship community.
-          </p>
         </div>
-
-        {/* Demo Fill Trigger */}
-        <button
-          type="button"
-          onClick={handleQuickDemoFill}
-          className="flex items-center gap-2 px-3.5 py-2 bg-secondary/15 text-primary border border-secondary/30 rounded-lg text-xs font-bold hover:bg-secondary hover:text-white transition-all shadow-xs"
-          title="Auto-fill sample student data for demonstration"
-        >
-          <Sparkles className="w-4 h-4 text-secondary" />
-          <span>Demo Auto-Fill</span>
-        </button>
       </div>
 
-      {/* Main Grid: Form (Left) + Live Fellowship Card (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Form Column */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-outline-variant/80 shadow-card p-6 md:p-8 accent-gold-top">
-          <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            {/* Section 1: Personal & Academic Info */}
-            <div className="space-y-4">
-              <div className="border-b border-outline-variant/60 pb-2">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
-                  <User className="w-4 h-4 text-secondary" />
-                  Personal & Academic Information
-                </h2>
-              </div>
+      {/* Form Container */}
+      <div className="bg-white rounded-b-xl border border-slate-200 border-t-0 shadow-sm p-6 sm:p-8 space-y-8">
+        {/* Important Notice */}
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-slate-800 text-xs">
+          <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-semibold text-slate-900 block mb-0.5">Notice to All Applicants:</span>
+            <span>
+              Please ensure all details entered below match your official University of Cape Coast student records. Fields marked with an asterisk (<span className="text-red-600 font-bold">*</span>) are mandatory.
+            </span>
+          </div>
+        </div>
 
+        <form onSubmit={handleSubmit} noValidate className="space-y-8">
+          {/* SECTION 1: Personal & Academic Profile */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-200">
+              <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">
+                1
+              </span>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                Personal & Academic Profile
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Full Name */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
-                  Full Name <span className="text-error">*</span>
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Full Name (Surname First) <span className="text-red-600">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    placeholder="e.g. Kwame Mensah"
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
-                      errors.fullName
-                        ? 'border-error ring-1 ring-error bg-red-50/20'
-                        : 'border-outline-variant bg-surface hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/10'
-                    }`}
-                  />
-                  <User className="w-4 h-4 text-outline absolute left-3.5 top-1/2 -translate-y-1/2" />
-                </div>
+                <input
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => handleInputChange('fullName', e.target.value)}
+                  placeholder="e.g. Mensah, Kwame"
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                    errors.fullName
+                      ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                      : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                  }`}
+                />
                 {errors.fullName && (
-                  <p className="text-xs text-error mt-1 flex items-center gap-1 font-medium">
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.fullName}
                   </p>
                 )}
               </div>
 
               {/* Phone Number */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
-                  Phone Number <span className="text-error">*</span>
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Telephone Number <span className="text-red-600">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="e.g. 0541234567"
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
-                      errors.phone
-                        ? 'border-error ring-1 ring-error bg-red-50/20'
-                        : 'border-outline-variant bg-surface hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/10'
-                    }`}
-                  />
-                  <Phone className="w-4 h-4 text-outline absolute left-3.5 top-1/2 -translate-y-1/2" />
-                </div>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  placeholder="e.g. 0541234567"
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                    errors.phone
+                      ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                      : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                  }`}
+                />
                 {errors.phone && (
-                  <p className="text-xs text-error mt-1 flex items-center gap-1 font-medium">
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.phone}
                   </p>
                 )}
               </div>
 
               {/* Program of Study */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
-                  Program of Study <span className="text-error">*</span>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Program of Study <span className="text-red-600">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formData.programOfStudy}
-                    onChange={(e) => handleInputChange('programOfStudy', e.target.value)}
-                    placeholder="e.g. BSc. Computer Science, BCom. Accounting"
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
-                      errors.programOfStudy
-                        ? 'border-error ring-1 ring-error bg-red-50/20'
-                        : 'border-outline-variant bg-surface hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/10'
-                    }`}
-                  />
-                  <BookOpen className="w-4 h-4 text-outline absolute left-3.5 top-1/2 -translate-y-1/2" />
-                </div>
+                <input
+                  type="text"
+                  value={formData.programOfStudy}
+                  onChange={(e) => handleInputChange('programOfStudy', e.target.value)}
+                  placeholder="e.g. Bachelor of Science in Computer Science"
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                    errors.programOfStudy
+                      ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                      : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                  }`}
+                />
                 {errors.programOfStudy && (
-                  <p className="text-xs text-error mt-1 flex items-center gap-1 font-medium">
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.programOfStudy}
                   </p>
                 )}
               </div>
 
               {/* Level of Study */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">
-                  Level of Study <span className="text-error">*</span>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Academic Level <span className="text-red-600">*</span>
                 </label>
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                   {LEVELS.map((lvl) => {
@@ -306,43 +286,47 @@ export const RegistrationForm = ({ onSuccess }) => {
                         key={lvl}
                         type="button"
                         onClick={() => handleInputChange('level', lvl)}
-                        className={`py-2 px-3 rounded-xl border text-sm font-semibold transition-all ${
+                        className={`py-2 px-3 rounded-lg border text-xs font-semibold transition-all ${
                           isSelected
-                            ? 'bg-primary text-white border-primary shadow-sm ring-2 ring-primary/20'
-                            : 'bg-surface border-outline-variant text-on-surface hover:bg-surface-container'
+                            ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                            : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
                         }`}
                       >
-                        {lvl}
+                        Level {lvl}
                       </button>
                     );
                   })}
                 </div>
                 {errors.level && (
-                  <p className="text-xs text-error mt-1 flex items-center gap-1 font-medium">
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.level}
                   </p>
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Section 2: Residential Details */}
-            <div className="space-y-4 pt-2">
-              <div className="border-b border-outline-variant/60 pb-2">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
-                  <Home className="w-4 h-4 text-secondary" />
-                  Residential Details
-                </h2>
-              </div>
+          {/* SECTION 2: Residential & Accommodation Data */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-200">
+              <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">
+                2
+              </span>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                Residential & Accommodation Data
+              </h2>
+            </div>
 
+            <div className="space-y-4">
               {/* Hall of Affiliation */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
-                  Hall of Affiliation <span className="text-error">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Official Hall of Affiliation <span className="text-red-600">*</span>
                 </label>
                 <select
                   value={formData.hallOfAffiliation}
                   onChange={(e) => handleInputChange('hallOfAffiliation', e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-outline-variant bg-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/10"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-900 focus:outline-none focus:border-slate-900"
                 >
                   {HALLS_OF_AFFILIATION.map((hall) => (
                     <option key={hall} value={hall}>
@@ -351,23 +335,23 @@ export const RegistrationForm = ({ onSuccess }) => {
                   ))}
                 </select>
                 {errors.hallOfAffiliation && (
-                  <p className="text-xs text-error mt-1 flex items-center gap-1 font-medium">
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.hallOfAffiliation}
                   </p>
                 )}
               </div>
 
-              {/* Residence Type Radio */}
+              {/* Residence Category */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-2">
-                  Residence Type <span className="text-error">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Current Residence on Campus <span className="text-red-600">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <label
-                    className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
                       formData.residenceType === 'Hall'
-                        ? 'bg-primary/5 border-primary ring-1 ring-primary'
-                        : 'bg-surface border-outline-variant hover:bg-surface-container'
+                        ? 'bg-slate-900 text-white border-slate-900 font-semibold'
+                        : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     <input
@@ -376,19 +360,16 @@ export const RegistrationForm = ({ onSuccess }) => {
                       value="Hall"
                       checked={formData.residenceType === 'Hall'}
                       onChange={() => handleInputChange('residenceType', 'Hall')}
-                      className="text-primary focus:ring-primary"
+                      className="accent-slate-900"
                     />
-                    <div>
-                      <p className="text-sm font-bold text-primary">Hall Resident</p>
-                      <p className="text-xs text-outline">Residing in campus hall</p>
-                    </div>
+                    <span className="text-xs">Hall Resident</span>
                   </label>
 
                   <label
-                    className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                    className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
                       formData.residenceType === 'Hostel'
-                        ? 'bg-primary/5 border-primary ring-1 ring-primary'
-                        : 'bg-surface border-outline-variant hover:bg-surface-container'
+                        ? 'bg-slate-900 text-white border-slate-900 font-semibold'
+                        : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     <input
@@ -397,186 +378,169 @@ export const RegistrationForm = ({ onSuccess }) => {
                       value="Hostel"
                       checked={formData.residenceType === 'Hostel'}
                       onChange={() => handleInputChange('residenceType', 'Hostel')}
-                      className="text-primary focus:ring-primary"
+                      className="accent-slate-900"
                     />
-                    <div>
-                      <p className="text-sm font-bold text-primary">Hostel</p>
-                      <p className="text-xs text-outline">Off-campus residence</p>
-                    </div>
+                    <span className="text-xs">Hostel Resident</span>
                   </label>
                 </div>
               </div>
 
-              {/* Room Number (Conditioned on Hall) */}
+              {/* Room Number (Hall) */}
               {formData.residenceType === 'Hall' && (
-                <div className="animate-in fade-in duration-200">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
-                    Room Number <span className="text-error">*</span>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Hall Room Number <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.roomNumber}
                     onChange={(e) => handleInputChange('roomNumber', e.target.value)}
-                    placeholder="e.g. C34, A12, Room 4"
-                    className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all ${
+                    placeholder="e.g. Block C, Room 34"
+                    className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
                       errors.roomNumber
-                        ? 'border-error ring-1 ring-error bg-red-50/20'
-                        : 'border-outline-variant bg-surface hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/10'
+                        ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                        : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
                     }`}
                   />
                   {errors.roomNumber && (
-                    <p className="text-xs text-error mt-1 flex items-center gap-1 font-medium">
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
                       <AlertCircle className="w-3.5 h-3.5" /> {errors.roomNumber}
                     </p>
                   )}
                 </div>
               )}
-            </div>
 
-            {/* Section 3: Passport Photo */}
-            <div className="space-y-4 pt-2">
-              <div className="border-b border-outline-variant/60 pb-2">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
-                  <Camera className="w-4 h-4 text-secondary" />
-                  Passport Photo
-                </h2>
-              </div>
-
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-outline-variant hover:border-primary rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-colors bg-surface-container-low"
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-                {photoPreview ? (
-                  <div className="relative group">
-                    <img
-                      src={photoPreview}
-                      alt="Student Preview"
-                      className="w-28 h-28 object-cover rounded-xl border-2 border-secondary shadow-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={removePhoto}
-                      className="absolute -top-2 -right-2 bg-error text-white p-1 rounded-full shadow hover:scale-110 transition-transform"
-                      title="Remove Photo"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-center space-y-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
-                      <Upload className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-primary">Click to upload passport photo</p>
-                      <p className="text-[11px] text-outline">JPG, PNG up to 5MB</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Submit Error */}
-            {submitError && (
-              <div className="flex items-start gap-2 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <p className="text-xs font-medium">{submitError}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="pt-4 border-t border-outline-variant/60">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-primary text-white rounded-xl text-sm font-bold hover:bg-academic-midnight transition-all shadow-md active:scale-[0.99] disabled:opacity-50"
-              >
-                <Send className="w-4 h-4" />
-                <span>{isSubmitting ? 'Registering...' : 'Register Member'}</span>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Live Fellowship Member Card (Right Column) */}
-        <div className="lg:col-span-5 sticky top-20 space-y-4">
-          <div className="bg-white rounded-2xl border border-outline-variant/80 shadow-card p-6 overflow-hidden accent-gold-top">
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/80">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
-                  <Church className="w-4 h-4 text-gold-300" />
-                </div>
+              {/* Hostel Name (Hostel) */}
+              {formData.residenceType === 'Hostel' && (
                 <div>
-                  <h3 className="text-xs font-bold text-primary uppercase tracking-wider">
-                    Fellowship Pass
-                  </h3>
-                  <p className="text-[10px] text-outline">Live Member Card Preview</p>
-                </div>
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                NUTFS UCC
-              </span>
-            </div>
-
-            {/* Card Content */}
-            <div className="mt-5 p-5 rounded-xl bg-surface-container-low border border-outline-variant space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-20 h-20 rounded-xl border-2 border-secondary overflow-hidden bg-white shrink-0 flex items-center justify-center shadow-sm">
-                  {photoPreview ? (
-                    <img
-                      src={photoPreview}
-                      alt="Member Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-8 h-8 text-outline" />
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Hostel Name <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.hostelName}
+                    onChange={(e) => handleInputChange('hostelName', e.target.value)}
+                    placeholder="e.g. Amamoma Hostel, Ayensu Hostel"
+                    className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                      errors.hostelName
+                        ? 'border-red-500 bg-red-50/20 focus:border-red-500'
+                        : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                    }`}
+                  />
+                  {errors.hostelName && (
+                    <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5" /> {errors.hostelName}
+                    </p>
                   )}
                 </div>
-                <div className="min-w-0 flex-1 space-y-1">
-                  <span className="text-[10px] font-bold text-secondary uppercase tracking-widest block">
-                    University of Cape Coast
-                  </span>
-                  <h4 className="text-base font-bold font-serif text-primary truncate">
-                    {formData.fullName || 'Student Full Name'}
-                  </h4>
-                  <p className="text-xs text-on-surface font-medium truncate">
-                    {formData.programOfStudy || 'Programme of Study'}
-                  </p>
-                  <p className="text-[11px] text-outline">
-                    Level {formData.level} • {formData.phone || 'Phone Number'}
-                  </p>
-                </div>
-              </div>
+              )}
+            </div>
+          </div>
 
-              {/* Hall Details */}
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-outline-variant text-xs">
-                <div>
-                  <span className="text-outline uppercase text-[10px] font-bold block">Hall</span>
-                  <span className="font-semibold text-primary">{formData.hallOfAffiliation}</span>
-                </div>
-                <div>
-                  <span className="text-outline uppercase text-[10px] font-bold block">Residence</span>
-                  <span className="font-semibold text-primary">
-                    {formData.residenceType === 'Hall'
-                      ? `Room ${formData.roomNumber || '—'}`
-                      : 'Hostel Resident'}
-                  </span>
-                </div>
-              </div>
+          {/* SECTION 3: Passport Photograph Upload */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-200">
+              <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">
+                3
+              </span>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
+                Passport Photograph Upload
+              </h2>
             </div>
 
-            <p className="text-[11px] text-outline mt-3 text-center">
-              The digital pass updates in real-time as registration fields are completed.
-            </p>
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-slate-300 hover:border-slate-600 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/60"
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              {photoPreview ? (
+                <div className="relative group">
+                  <img
+                    src={photoPreview}
+                    alt="Passport Photograph"
+                    className="w-28 h-28 object-cover rounded-md border-2 border-slate-900 shadow-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={removePhoto}
+                    className="absolute -top-2 -right-2 bg-slate-900 text-white p-1 rounded-full shadow hover:bg-red-600 transition-colors"
+                    title="Remove Photo"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center space-y-1.5">
+                  <Upload className="w-6 h-6 text-slate-500 mx-auto mb-1" />
+                  <p className="text-xs font-semibold text-slate-800">Upload Official Passport Photo</p>
+                  <p className="text-[11px] text-slate-500">Supported formats: JPG, PNG • Max size: 5MB</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+
+          {/* SECTION 4: Declaration & Certification */}
+          <div className="pt-4 border-t border-slate-200 space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <div 
+                className="mt-0.5 shrink-0" 
+                onClick={() => {
+                  setIsDeclared(!isDeclared);
+                  if (errors.declaration) setErrors((prev) => ({ ...prev, declaration: '' }));
+                }}
+              >
+                {isDeclared ? (
+                  <CheckSquare className="w-4 h-4 text-slate-900" />
+                ) : (
+                  <Square className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                )}
+              </div>
+              <span className="text-xs text-slate-700 leading-relaxed">
+                I hereby declare that all particulars furnished in this registration form are true, complete, and correct to the best of my knowledge and belief.
+              </span>
+            </label>
+            {errors.declaration && (
+              <p className="text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" /> {errors.declaration}
+              </p>
+            )}
+          </div>
+
+          {/* Submit Error */}
+          {submitError && (
+            <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-start gap-2.5 text-xs font-medium">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{submitError}</span>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900/30 disabled:opacity-50 shadow-sm"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Processing Registration...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>Submit Official Registration</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
