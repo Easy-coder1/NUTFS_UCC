@@ -1,16 +1,11 @@
 import React from 'react';
 import { 
   CheckCircle2, 
-  Printer, 
   UserPlus, 
   User 
 } from 'lucide-react';
 
 export const ThankYouView = ({ submittedData, onReset }) => {
-  const handlePrint = () => {
-    window.print();
-  };
-
   if (!submittedData) {
     return (
       <div className="w-full max-w-md mx-auto p-6 text-center bg-white rounded-xl border border-slate-200 my-12">
@@ -40,14 +35,6 @@ export const ThankYouView = ({ submittedData, onReset }) => {
             </p>
           </div>
         </div>
-
-        <button
-          onClick={handlePrint}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-800 transition-colors shrink-0"
-        >
-          <Printer className="w-3.5 h-3.5" />
-          <span>Print Slip</span>
-        </button>
       </div>
 
       {/* Printable Slip Card */}
