@@ -17,12 +17,16 @@ create table if not exists public.students (
   created_at timestamptz default now()
 );
 
--- 2. Enable Row Level Security
+-- 2. Grant table permissions to anon and authenticated roles
+grant usage on schema public to anon, authenticated;
+grant all on table public.students to anon, authenticated, service_role;
+
+-- 3. Enable Row Level Security
 alter table public.students enable row level security;
 
--- 3. RLS Policies
+-- 4. RLS Policies
 
--- Anyone (anon) can INSERT (public registration form)
+-- Anyone (anon & authenticated) can INSERT (public registration form)
 create policy "Anyone can register"
   on public.students for insert
   to anon, authenticated
