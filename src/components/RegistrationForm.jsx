@@ -164,7 +164,7 @@ export const RegistrationForm = ({ onSuccess }) => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider block">
-              National Union of Teshie Fellowship Students
+              National Union of True Faith Students
             </span>
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-0.5">
               NUTFS UCC Member Registration

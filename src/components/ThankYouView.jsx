@@ -58,7 +58,7 @@ export const ThankYouView = ({ submittedData, onReset }) => {
               NUTFS UCC Member Slip
             </h1>
             <p className="text-xs text-slate-500">
-              National Union of Teshie Fellowship Students • UCC Chapter
+              National Union of True Faith Students • UCC Chapter
             </p>
           </div>
         </div>
