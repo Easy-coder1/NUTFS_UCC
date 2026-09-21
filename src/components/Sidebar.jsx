@@ -38,7 +38,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-slate-900 hover:bg-amber-400 transition-colors shadow-xs"
                 >
                   <User className="w-3.5 h-3.5" />
-                  <span>My Card</span>
+                  <span>Student Page</span>
                 </button>
               )}
 

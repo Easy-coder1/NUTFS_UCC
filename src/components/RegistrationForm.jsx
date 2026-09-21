@@ -168,17 +168,12 @@ export const RegistrationForm = ({ onSuccess }) => {
         : `${formData.degreeType} ${formData.programName.trim()}`;
 
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
+      const cleanEmail = formData.email.trim().toLowerCase();
 
-      // Create student credentials in Supabase Auth
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: formData.email.trim(),
-        password: formData.password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: formData.phone.trim()
-          }
-        }
+      // Create student credentials in Supabase Auth (auth-only, no redundant profile metadata)
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password: formData.password
       });
 
       if (signUpError) {
@@ -188,9 +183,26 @@ export const RegistrationForm = ({ onSuccess }) => {
         throw new Error(`Account setup error: ${signUpError.message}`);
       }
 
+      // Automatically sign in if session is not immediately established by signUp
+      if (!authData?.session) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password: formData.password
+          });
+        } catch (signInErr) {
+          // If email confirmation is required by Supabase config, proceed gracefully
+          console.log('Post-signup auto-signin note:', signInErr?.message);
+        }
+      }
+
+      const authUserId = authData?.user?.id;
+
+      // Link student record directly using the exact same Auth User ID
       const created = await addStudent({
+        id: authUserId,
         fullName,
-        email: formData.email.trim(),
+        email: cleanEmail,
         phone: formData.phone.trim(),
         programOfStudy: fullProgram,
         level: formData.level,

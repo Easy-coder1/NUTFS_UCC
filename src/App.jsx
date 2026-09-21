@@ -46,6 +46,7 @@ function AppContent() {
           <ThankYouView
             submittedData={submittedData}
             onReset={handleReset}
+            onViewCard={() => setActiveTab('profile')}
           />
         )}
 
@@ -91,7 +92,7 @@ function AppContent() {
               }}
               className={`hover:text-slate-800 underline transition-colors ${activeTab === 'profile' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
             >
-              My Card
+              Student Page
             </button>
           ) : (
             <button

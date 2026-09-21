@@ -6,7 +6,7 @@ import {
   Printer
 } from 'lucide-react';
 
-export const ThankYouView = ({ submittedData, onReset }) => {
+export const ThankYouView = ({ submittedData, onReset, onViewCard }) => {
   if (!submittedData) {
     return (
       <div className="w-full max-w-md mx-auto p-6 text-center bg-white rounded-xl border border-slate-200 my-12">
@@ -98,7 +98,18 @@ export const ThankYouView = ({ submittedData, onReset }) => {
       </div>
 
       {/* Trailing Actions */}
-      <div className="flex justify-center items-center gap-3 no-print">
+      <div className="flex flex-wrap justify-center items-center gap-3 no-print">
+        {onViewCard && (
+          <button
+            type="button"
+            onClick={onViewCard}
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-500 text-slate-900 rounded-lg text-xs font-semibold hover:bg-amber-400 transition-colors shadow-xs"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Go to My Student Page</span>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => window.print()}

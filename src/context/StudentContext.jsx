@@ -106,14 +106,28 @@ export const StudentProvider = ({ children }) => {
         passport_photo_url: photoUrl,
       };
 
+      if (newStudentData.id) {
+        row.id = newStudentData.id;
+      }
+
       if (newStudentData.email) {
-        row.email = newStudentData.email;
+        row.email = newStudentData.email.trim().toLowerCase();
       }
 
       // Pure INSERT without requiring SELECT privilege/policy
       let { error: insertError } = await supabase
         .from('students')
         .insert(row);
+
+      // If insert failed because manual id wasn't accepted, retry without id
+      if (insertError && row.id) {
+        const fallbackRow = { ...row };
+        delete fallbackRow.id;
+        const retryWithGeneratedId = await supabase.from('students').insert(fallbackRow);
+        if (!retryWithGeneratedId.error) {
+          insertError = null;
+        }
+      }
 
       // If database doesn't have the 'email' column yet, fallback gracefully
       if (insertError && insertError.message && insertError.message.toLowerCase().includes('email')) {
@@ -125,7 +139,7 @@ export const StudentProvider = ({ children }) => {
       if (insertError) throw insertError;
 
       const created = {
-        id: crypto.randomUUID(),
+        id: newStudentData.id || crypto.randomUUID(),
         fullName: newStudentData.fullName,
         email: newStudentData.email || '',
         phone: newStudentData.phone,
@@ -212,6 +226,86 @@ export const StudentProvider = ({ children }) => {
     document.body.removeChild(link);
   };
 
+  // Update an existing student
+  const updateStudent = async (id, updatedFields, newPhotoFile = null) => {
+    setError(null);
+    try {
+      let photoUrl = updatedFields.passportPhoto || '';
+
+      // If a new File object is provided, upload it to Storage
+      if (newPhotoFile instanceof File) {
+        photoUrl = await uploadPassportPhoto(newPhotoFile);
+      }
+
+      const row = {
+        full_name: updatedFields.fullName,
+        phone: updatedFields.phone,
+        program_of_study: updatedFields.programOfStudy,
+        level: updatedFields.level,
+        hall_of_affiliation: updatedFields.hallOfAffiliation,
+        residence_type: updatedFields.residenceType,
+        room_number: updatedFields.residenceType === 'Hall' 
+          ? (updatedFields.roomNumber || '') 
+          : (updatedFields.hostelName || updatedFields.roomNumber || ''),
+      };
+
+      if (photoUrl) {
+        row.passport_photo_url = photoUrl;
+      }
+
+      const cleanEmail = (updatedFields.email || '').trim().toLowerCase();
+      if (cleanEmail) {
+        row.email = cleanEmail;
+      }
+
+      let updateError = null;
+
+      // Try updating by id first if valid
+      if (id) {
+        const res = await supabase
+          .from('students')
+          .update(row)
+          .eq('id', id);
+        updateError = res.error;
+      }
+
+      // If id update failed or id wasn't present, match by email
+      if ((!id || updateError) && cleanEmail) {
+        const retryByEmail = await supabase
+          .from('students')
+          .update(row)
+          .ilike('email', cleanEmail);
+        updateError = retryByEmail.error;
+      }
+
+      if (updateError && updateError.message && updateError.message.toLowerCase().includes('email')) {
+        delete row.email;
+        if (id) {
+          const retryResult = await supabase.from('students').update(row).eq('id', id);
+          updateError = retryResult.error;
+        } else if (cleanEmail) {
+          const retryResult = await supabase.from('students').update(row).ilike('email', cleanEmail);
+          updateError = retryResult.error;
+        }
+      }
+
+      if (updateError) throw updateError;
+
+      const updated = {
+        ...updatedFields,
+        id,
+        passportPhoto: photoUrl || updatedFields.passportPhoto || '',
+      };
+
+      setStudents((prev) => prev.map((s) => (s.id === id || (cleanEmail && s.email?.toLowerCase() === cleanEmail)) ? { ...s, ...updated } : s));
+      return updated;
+    } catch (err) {
+      console.error('Error updating student:', err);
+      setError(err.message);
+      throw err;
+    }
+  };
+
   return (
     <StudentContext.Provider
       value={{
@@ -219,6 +313,8 @@ export const StudentProvider = ({ children }) => {
         loading,
         error,
         addStudent,
+        updateStudent,
+        uploadPassportPhoto,
         deleteStudent,
         exportToCSV,
         refetch: fetchStudents
