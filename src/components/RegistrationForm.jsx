@@ -12,7 +12,9 @@ import {
   CheckSquare,
   Square,
   Mail,
-  Lock
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export const RegistrationForm = ({ onSuccess }) => {
@@ -37,6 +39,8 @@ export const RegistrationForm = ({ onSuccess }) => {
     passportPhotoFile: null
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isDeclared, setIsDeclared] = useState(false);
   const [errors, setErrors] = useState({});
   const [photoPreview, setPhotoPreview] = useState('');
@@ -434,22 +438,35 @@ export const RegistrationForm = ({ onSuccess }) => {
                   {/* Password */}
                   <div className="sm:col-span-1">
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Create Password <span className="text-red-600">*</span>
+                       Create Password <span className="text-red-600">*</span>
                     </label>
                     <div className="relative">
                       <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
                         placeholder="Min. 6 characters"
                         autoComplete="new-password"
-                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                        className={`w-full pl-9 pr-10 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
                           errors.password
                             ? 'border-red-500 bg-red-50/20'
                             : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
                         }`}
                       />
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+                        tabIndex={-1}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
                     {errors.password && (
                       <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
@@ -465,18 +482,31 @@ export const RegistrationForm = ({ onSuccess }) => {
                     </label>
                     <div className="relative">
                       <input
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         value={formData.confirmPassword}
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                         placeholder="Re-enter password"
                         autoComplete="new-password"
-                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                        className={`w-full pl-9 pr-10 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
                           errors.confirmPassword
                             ? 'border-red-500 bg-red-50/20'
                             : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
                         }`}
                       />
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+                        tabIndex={-1}
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
                     {errors.confirmPassword && (
                       <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
