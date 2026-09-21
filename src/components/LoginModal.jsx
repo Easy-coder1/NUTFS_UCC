@@ -43,8 +43,8 @@ export const LoginModal = ({ onClose }) => {
         )}
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-slate-900 font-sans">Portal Sign In</h2>
-          <p className="text-sm text-slate-500 mt-1">Sign in with your email to view your member card or manage portal</p>
+          <h2 className="text-xl font-semibold text-slate-900 font-sans">Sign In</h2>
+          <p className="text-sm text-slate-500 mt-1">Sign in with your email to view your member card</p>
         </div>
 
         {error && (

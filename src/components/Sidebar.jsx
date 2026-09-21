@@ -82,7 +82,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white border border-white/15 transition-colors shadow-xs"
                 >
                   <LogIn className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Portal Sign In</span>
+                  <span>Sign In</span>
                 </button>
               )}
             </>
