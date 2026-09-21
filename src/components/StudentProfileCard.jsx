@@ -63,15 +63,27 @@ export const StudentProfileCard = ({ onOpenRegistration }) => {
       try {
         setLoading(true);
         const cleanEmail = user.email.trim().toLowerCase();
+
+        // 1. Direct ID match (auth.users.id === students.id)
         let { data, error } = await supabase
           .from('students')
           .select('*')
-          .ilike('email', cleanEmail)
-          .order('created_at', { ascending: false })
-          .limit(1)
+          .eq('id', user.id)
           .maybeSingle();
 
-        // Fallback: match by phone if metadata has phone and email lookup had no match
+        // 2. Fallback: match by email for legacy records
+        if (!data) {
+          const { data: emailData } = await supabase
+            .from('students')
+            .select('*')
+            .ilike('email', cleanEmail)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (emailData) data = emailData;
+        }
+
+        // 3. Fallback: match by phone
         if (!data && user.user_metadata?.phone) {
           const { data: phoneData } = await supabase
             .from('students')
@@ -216,14 +228,6 @@ export const StudentProfileCard = ({ onOpenRegistration }) => {
         });
         if (pwdErr) throw pwdErr;
       }
-
-      // Sync auth metadata full_name and phone
-      supabase.auth.updateUser({
-        data: {
-          full_name: editFormData.fullName.trim(),
-          phone: editFormData.phone.trim()
-        }
-      }).catch((metaErr) => console.log('Metadata sync notice:', metaErr?.message));
 
       setStudent((prev) => ({
         ...prev,

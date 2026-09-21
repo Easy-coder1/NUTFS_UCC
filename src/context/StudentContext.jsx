@@ -106,14 +106,28 @@ export const StudentProvider = ({ children }) => {
         passport_photo_url: photoUrl,
       };
 
+      if (newStudentData.id) {
+        row.id = newStudentData.id;
+      }
+
       if (newStudentData.email) {
-        row.email = newStudentData.email;
+        row.email = newStudentData.email.trim().toLowerCase();
       }
 
       // Pure INSERT without requiring SELECT privilege/policy
       let { error: insertError } = await supabase
         .from('students')
         .insert(row);
+
+      // If insert failed because manual id wasn't accepted, retry without id
+      if (insertError && row.id) {
+        const fallbackRow = { ...row };
+        delete fallbackRow.id;
+        const retryWithGeneratedId = await supabase.from('students').insert(fallbackRow);
+        if (!retryWithGeneratedId.error) {
+          insertError = null;
+        }
+      }
 
       // If database doesn't have the 'email' column yet, fallback gracefully
       if (insertError && insertError.message && insertError.message.toLowerCase().includes('email')) {
@@ -125,7 +139,7 @@ export const StudentProvider = ({ children }) => {
       if (insertError) throw insertError;
 
       const created = {
-        id: crypto.randomUUID(),
+        id: newStudentData.id || crypto.randomUUID(),
         fullName: newStudentData.fullName,
         email: newStudentData.email || '',
         phone: newStudentData.phone,

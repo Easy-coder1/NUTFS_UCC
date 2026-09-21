@@ -170,16 +170,10 @@ export const RegistrationForm = ({ onSuccess }) => {
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
       const cleanEmail = formData.email.trim().toLowerCase();
 
-      // Create student credentials in Supabase Auth
+      // Create student credentials in Supabase Auth (auth-only, no redundant profile metadata)
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: cleanEmail,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: formData.phone.trim()
-          }
-        }
+        password: formData.password
       });
 
       if (signUpError) {
@@ -202,7 +196,11 @@ export const RegistrationForm = ({ onSuccess }) => {
         }
       }
 
+      const authUserId = authData?.user?.id;
+
+      // Link student record directly using the exact same Auth User ID
       const created = await addStudent({
+        id: authUserId,
         fullName,
         email: cleanEmail,
         phone: formData.phone.trim(),
