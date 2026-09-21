@@ -79,9 +79,10 @@ function AppContent() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-slate-200/80 py-4 px-6 mt-auto no-print text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between max-w-4xl mx-auto">
-        <span>© {new Date().getFullYear()} NUTFS UCC Student Registration Portal • University of Cape Coast</span>
-        <div className="flex items-center gap-4 mt-2 sm:mt-0">
+      <footer className="w-full border-t border-slate-200/80 py-4 px-4 sm:px-6 mt-auto no-print text-center text-xs text-slate-400">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span className="text-center sm:text-left">© {new Date().getFullYear()} NUTFS UCC Student Registration Portal • University of Cape Coast</span>
+          <div className="flex items-center gap-3 sm:gap-4">
           <button
             type="button"
             onClick={() => {
@@ -114,7 +115,8 @@ function AppContent() {
             >
               Sign In
             </button>
-          )}
+            )}
+          </div>
         </div>
       </footer>
     </div>

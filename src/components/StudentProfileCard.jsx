@@ -283,7 +283,7 @@ export const StudentProfileCard = () => {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-5">
       {/* Toast Notification */}
       {successMessage && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-emerald-800 no-print animate-fade-in shadow-xs">
@@ -293,7 +293,7 @@ export const StudentProfileCard = () => {
       )}
 
       {/* Student Page Welcome Header Banner */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-7 border-b-4 border-amber-500 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-5 no-print">
+      <div className="bg-slate-900 text-white rounded-2xl p-4 sm:p-6 border-b-4 border-amber-500 shadow-md flex flex-col gap-4 no-print">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 border-amber-400/60 overflow-hidden bg-slate-800 shrink-0 flex items-center justify-center relative group shadow-sm">
             {student.passportPhoto ? (
@@ -315,7 +315,7 @@ export const StudentProfileCard = () => {
             </button>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 <ShieldCheck className="w-3 h-3" />
@@ -325,7 +325,7 @@ export const StudentProfileCard = () => {
                 NUTFS UCC
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
               {student.fullName}
             </h1>
             <p className="text-xs text-slate-300 font-medium">
@@ -335,7 +335,7 @@ export const StudentProfileCard = () => {
         </div>
 
         {/* Primary Page Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 pt-2 md:pt-0">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleOpenEdit}
@@ -367,7 +367,7 @@ export const StudentProfileCard = () => {
       </div>
 
       {/* Main Student Page Grid: Digital Card & Information Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         
         {/* Left / Main: The Official Member Card / Printable Slip */}
         <div className="lg:col-span-7 space-y-3">

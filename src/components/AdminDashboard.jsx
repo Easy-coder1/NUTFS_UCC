@@ -281,7 +281,7 @@ export const AdminDashboard = () => {
 
   // ── Admin UI ──────────────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-5">
 
       {/* Toast */}
       {successMsg && (
@@ -327,7 +327,7 @@ export const AdminDashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard label="Total Members" value={total} icon={Users} color="bg-slate-100 text-slate-700" />
         <StatCard label="Hall Residents" value={hallResidents} icon={Building} color="bg-blue-50 text-blue-600" />
         <StatCard label="Hostel / Private" value={hostelResidents} icon={Home} color="bg-amber-50 text-amber-600" />
@@ -335,9 +335,9 @@ export const AdminDashboard = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-3 sm:p-4">
+        <div className="flex flex-col gap-2 sm:gap-3">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input
               type="text"
@@ -347,39 +347,41 @@ export const AdminDashboard = () => {
               className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
             />
           </div>
-          <div className="relative">
-            <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
-            <select
-              value={filterLevel}
-              onChange={(e) => setFilterLevel(e.target.value)}
-              className="pl-7 pr-8 py-2 rounded-lg border border-slate-300 text-xs text-slate-700 focus:outline-none focus:border-slate-900 bg-white appearance-none min-w-[100px]"
-            >
-              <option value="">All Levels</option>
-              {levels.map((l) => <option key={l} value={l}>Level {l}</option>)}
-            </select>
-          </div>
-          <div className="relative">
-            <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
-            <select
-              value={filterHall}
-              onChange={(e) => setFilterHall(e.target.value)}
-              className="pl-7 pr-8 py-2 rounded-lg border border-slate-300 text-xs text-slate-700 focus:outline-none focus:border-slate-900 bg-white appearance-none min-w-[130px]"
-            >
-              <option value="">All Halls</option>
-              {halls.map((h) => <option key={h} value={h}>{h}</option>)}
-            </select>
-          </div>
-          <div className="relative">
-            <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
-            <select
-              value={filterResidence}
-              onChange={(e) => setFilterResidence(e.target.value)}
-              className="pl-7 pr-8 py-2 rounded-lg border border-slate-300 text-xs text-slate-700 focus:outline-none focus:border-slate-900 bg-white appearance-none min-w-[120px]"
-            >
-              <option value="">All Residences</option>
-              <option value="Hall">Hall</option>
-              <option value="Hostel">Hostel / Private</option>
-            </select>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="relative">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
+              <select
+                value={filterLevel}
+                onChange={(e) => setFilterLevel(e.target.value)}
+                className="w-full pl-7 pr-1 py-2 rounded-lg border border-slate-300 text-xs text-slate-700 focus:outline-none focus:border-slate-900 bg-white appearance-none"
+              >
+                <option value="">All Levels</option>
+                {levels.map((l) => <option key={l} value={l}>Level {l}</option>)}
+              </select>
+            </div>
+            <div className="relative">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
+              <select
+                value={filterHall}
+                onChange={(e) => setFilterHall(e.target.value)}
+                className="w-full pl-7 pr-1 py-2 rounded-lg border border-slate-300 text-xs text-slate-700 focus:outline-none focus:border-slate-900 bg-white appearance-none"
+              >
+                <option value="">All Halls</option>
+                {halls.map((h) => <option key={h} value={h}>{h}</option>)}
+              </select>
+            </div>
+            <div className="relative">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
+              <select
+                value={filterResidence}
+                onChange={(e) => setFilterResidence(e.target.value)}
+                className="w-full pl-7 pr-1 py-2 rounded-lg border border-slate-300 text-xs text-slate-700 focus:outline-none focus:border-slate-900 bg-white appearance-none"
+              >
+                <option value="">All</option>
+                <option value="Hall">Hall</option>
+                <option value="Hostel">Hostel</option>
+              </select>
+            </div>
           </div>
         </div>
         <p className="text-[11px] text-slate-400 mt-2 font-medium">
