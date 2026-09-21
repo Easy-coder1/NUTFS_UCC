@@ -230,17 +230,24 @@ export const RegistrationForm = ({ onSuccess }) => {
     <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-8">
       {/* Official Page Banner */}
       <div className="mb-6 bg-slate-900 text-white rounded-t-xl p-6 border-b-4 border-amber-500 shadow-sm">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div>
-            <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider block">
-              National Union of True Faith Students
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-0.5">
-              NUTFS UCC Member Registration
-            </h1>
-            <p className="text-xs text-slate-300 mt-1">
-              Official Membership Portal • University of Cape Coast Chapter
-            </p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-3.5">
+            <img
+              src="/NUTFS.png"
+              alt="NUTFS Logo"
+              className="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-xl bg-white/10 p-1 border border-white/15 shrink-0"
+            />
+            <div>
+              <span className="text-amber-400 text-xs font-semibold uppercase tracking-wider block">
+                National Union of True Faith Students
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-0.5">
+                NUTFS UCC Member Registration
+              </h1>
+              <p className="text-xs text-slate-300 mt-1">
+                Official Membership Portal • University of Cape Coast Chapter
+              </p>
+            </div>
           </div>
           <div className="shrink-0 pt-2 sm:pt-0">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono bg-white/10 text-slate-200 border border-white/15">

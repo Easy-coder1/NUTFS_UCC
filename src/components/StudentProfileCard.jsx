@@ -393,10 +393,12 @@ export const StudentProfileCard = () => {
             {/* Card Header */}
             <div className="border-b border-slate-200 pb-3.5 flex items-center justify-between">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="h-5 px-1.5 rounded bg-slate-900 text-amber-400 font-bold text-[10px] tracking-wider flex items-center">
-                    NUTFS
-                  </span>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/NUTFS.png"
+                    alt="NUTFS Logo"
+                    className="h-7 w-auto object-contain shrink-0"
+                  />
                   <span className="text-base font-bold text-slate-900">
                     NUTFS UCC Member Slip
                   </span>

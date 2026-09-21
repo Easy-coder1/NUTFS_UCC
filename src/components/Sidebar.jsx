@@ -17,11 +17,13 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
               setActiveTab('register');
             }
           }}
-          className="flex items-center gap-2 cursor-pointer select-none min-w-0"
+          className="flex items-center gap-2.5 cursor-pointer select-none min-w-0"
         >
-          <div className="h-8 sm:h-9 px-2 rounded-md bg-white/10 border border-white/20 flex items-center justify-center text-amber-400 font-bold text-xs tracking-wider shadow-xs shrink-0">
-            NUTFS
-          </div>
+          <img
+            src="/NUTFS.png"
+            alt="NUTFS UCC Logo"
+            className="h-8 sm:h-9 w-auto object-contain rounded-md shrink-0 bg-white/10 p-0.5"
+          />
           <div className="min-w-0">
             <span className="font-bold text-sm sm:text-base tracking-tight text-white block leading-tight truncate">
               NUTFS UCC
