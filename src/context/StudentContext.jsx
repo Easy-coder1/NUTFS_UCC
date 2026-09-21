@@ -106,16 +106,28 @@ export const StudentProvider = ({ children }) => {
         passport_photo_url: photoUrl,
       };
 
+      if (newStudentData.email) {
+        row.email = newStudentData.email;
+      }
+
       // Pure INSERT without requiring SELECT privilege/policy
-      const { error: insertError } = await supabase
+      let { error: insertError } = await supabase
         .from('students')
         .insert(row);
+
+      // If database doesn't have the 'email' column yet, fallback gracefully
+      if (insertError && insertError.message && insertError.message.toLowerCase().includes('email')) {
+        delete row.email;
+        const retryResult = await supabase.from('students').insert(row);
+        insertError = retryResult.error;
+      }
 
       if (insertError) throw insertError;
 
       const created = {
         id: crypto.randomUUID(),
         fullName: newStudentData.fullName,
+        email: newStudentData.email || '',
         phone: newStudentData.phone,
         programOfStudy: newStudentData.programOfStudy,
         level: newStudentData.level,
@@ -230,6 +242,7 @@ function mapDbToFrontend(row) {
   return {
     id: row.id,
     fullName: row.full_name,
+    email: row.email || '',
     phone: row.phone,
     programOfStudy: row.program_of_study,
     level: row.level,

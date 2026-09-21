@@ -74,3 +74,35 @@ create policy "Authenticated users can delete passport photos"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'passport-photos');
+
+-- ============================================================
+-- 6. Optional Email Column on Students Table
+-- ============================================================
+alter table public.students add column if not exists email text default '';
+
+-- ============================================================
+-- 7. Admin Authorization Table
+-- Run this to track which student/user accounts have admin rights
+-- ============================================================
+create table if not exists public.admin_users (
+  id uuid default gen_random_uuid() primary key,
+  email text unique not null,
+  created_at timestamptz default now()
+);
+
+-- Enable RLS for admin_users
+alter table public.admin_users enable row level security;
+
+-- Allow authenticated users to check their admin status
+create policy "Authenticated users can check admin status"
+  on public.admin_users for select
+  to authenticated
+  using (true);
+
+-- ============================================================
+-- 8. Make an Email an Admin (Replace with your actual email)
+-- ============================================================
+-- insert into public.admin_users (email)
+-- values ('your-email@example.com')
+-- on conflict (email) do nothing;
+

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { HALLS_OF_AFFILIATION, LEVELS, DEGREE_TYPES } from '../constants/data';
 import { useStudents } from '../context/StudentContext';
+import { supabase } from '../lib/supabase';
 import { 
   Upload, 
   Send, 
@@ -9,7 +10,9 @@ import {
   Loader2,
   ShieldCheck,
   CheckSquare,
-  Square
+  Square,
+  Mail,
+  Lock
 } from 'lucide-react';
 
 export const RegistrationForm = ({ onSuccess }) => {
@@ -20,6 +23,9 @@ export const RegistrationForm = ({ onSuccess }) => {
     firstName: '',
     lastName: '',
     phone: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
     degreeType: DEGREE_TYPES[0],
     programName: '',
     level: '100',
@@ -122,6 +128,24 @@ export const RegistrationForm = ({ onSuccess }) => {
       newErrors.hostelName = 'Hostel name is required for Hostel residents.';
     }
 
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address.';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Create password is required.';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters.';
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required.';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match.';
+    }
+
     if (!isDeclared) {
       newErrors.declaration = 'You must certify the declaration before submitting.';
     }
@@ -145,8 +169,28 @@ export const RegistrationForm = ({ onSuccess }) => {
 
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
 
+      // Create student credentials in Supabase Auth
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: formData.phone.trim()
+          }
+        }
+      });
+
+      if (signUpError) {
+        if (signUpError.message?.toLowerCase().includes('already registered')) {
+          throw new Error('This email is already registered. Please sign in or use a different email.');
+        }
+        throw new Error(`Account setup error: ${signUpError.message}`);
+      }
+
       const created = await addStudent({
         fullName,
+        email: formData.email.trim(),
         phone: formData.phone.trim(),
         programOfStudy: fullProgram,
         level: formData.level,
@@ -344,6 +388,91 @@ export const RegistrationForm = ({ onSuccess }) => {
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.level}
                   </p>
                 )}
+              </div>
+              {/* Account Credentials / Login Setup */}
+              <div className="sm:col-span-2 pt-2 border-t border-slate-200/80 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Email */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Email Address <span className="text-red-600">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="e.g. member@ucc.edu.gh or kwame@gmail.com"
+                        autoComplete="email"
+                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                          errors.email
+                            ? 'border-red-500 bg-red-50/20'
+                            : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                        }`}
+                      />
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    </div>
+                    {errors.email && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" /> {errors.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Password */}
+                  <div className="sm:col-span-1">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Create Password <span className="text-red-600">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        placeholder="Min. 6 characters"
+                        autoComplete="new-password"
+                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                          errors.password
+                            ? 'border-red-500 bg-red-50/20'
+                            : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                        }`}
+                      />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    </div>
+                    {errors.password && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" /> {errors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div className="sm:col-span-1">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Confirm Password <span className="text-red-600">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                        placeholder="Re-enter password"
+                        autoComplete="new-password"
+                        className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                          errors.confirmPassword
+                            ? 'border-red-500 bg-red-50/20'
+                            : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                        }`}
+                      />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    </div>
+                    {errors.confirmPassword && (
+                      <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" /> {errors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
