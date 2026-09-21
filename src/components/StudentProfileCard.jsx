@@ -10,7 +10,6 @@ import {
   Loader2, 
   Phone, 
   Mail, 
-  FileText,
   Edit,
   CheckCircle2,
   X,
@@ -24,7 +23,7 @@ import {
   KeyRound
 } from 'lucide-react';
 
-export const StudentProfileCard = ({ onOpenRegistration }) => {
+export const StudentProfileCard = () => {
   const { user, signOut } = useAuth();
   const { updateStudent } = useStudents();
   const [student, setStudent] = useState(null);
@@ -272,14 +271,6 @@ export const StudentProfileCard = ({ onOpenRegistration }) => {
           </p>
         </div>
         <div className="flex flex-col gap-2 pt-2">
-          {onOpenRegistration && (
-            <button
-              onClick={onOpenRegistration}
-              className="w-full px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition-colors"
-            >
-              Fill Member Registration Form
-            </button>
-          )}
           <button
             onClick={signOut}
             className="text-xs text-slate-500 hover:text-slate-800 underline mt-1"
@@ -566,20 +557,6 @@ export const StudentProfileCard = ({ onOpenRegistration }) => {
               </div>
             </div>
           </div>
-
-          {/* Registration link option */}
-          {onOpenRegistration && (
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={onOpenRegistration}
-                className="w-full py-2 px-3 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                <span>Register Another Member</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
 

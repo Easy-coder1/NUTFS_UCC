@@ -1,7 +1,6 @@
 import React from 'react';
 import { 
   CheckCircle2, 
-  UserPlus, 
   User,
   Printer
 } from 'lucide-react';
@@ -117,15 +116,6 @@ export const ThankYouView = ({ submittedData, onReset, onViewCard }) => {
         >
           <Printer className="w-3.5 h-3.5" />
           <span>Print Slip / Card</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={onReset}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors"
-        >
-          <UserPlus className="w-3.5 h-3.5" />
-          <span>Register Another Member</span>
         </button>
       </div>
     </div>

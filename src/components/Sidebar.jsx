@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, User, LogIn, LogOut } from 'lucide-react';
+import { ArrowLeft, User, LogIn, LogOut, Crown } from 'lucide-react';
 
 export const Sidebar = ({ activeTab, setActiveTab }) => {
-  const { user, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <header className="w-full bg-slate-900 text-white border-b-2 border-amber-500 shadow-md sticky top-0 z-40">
@@ -29,6 +29,18 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
           {/* Navigation buttons based on auth state */}
           {user ? (
             <>
+
+              {/* Admin Panel link */}
+              {isAdmin && activeTab !== 'admin' && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab && setActiveTab('admin')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 text-white hover:bg-purple-500 transition-colors shadow-xs"
+                >
+                  <Crown className="w-3.5 h-3.5" />
+                  <span>Admin Panel</span>
+                </button>
+              )}
 
               {/* Profile Card link */}
               {activeTab !== 'profile' && (
