@@ -41,10 +41,17 @@ export const ThankYouView = ({ submittedData, onReset, onViewCard }) => {
       <div className="bg-white rounded-xl border border-slate-200 p-6 md:p-7 printable-slip space-y-5">
         <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
           <div>
-            <h1 className="text-base font-bold text-slate-900">
-              NUTFS UCC Member Slip
-            </h1>
-            <p className="text-xs text-slate-500">
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/NUTFS.png"
+                alt="NUTFS Logo"
+                className="h-7 w-auto object-contain shrink-0"
+              />
+              <h1 className="text-base font-bold text-slate-900">
+                NUTFS UCC Member Slip
+              </h1>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
               National Union of True Faith Students • UCC Chapter
             </p>
           </div>
