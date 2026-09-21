@@ -4,25 +4,20 @@ import { StudentProvider } from './context/StudentContext';
 import { Sidebar } from './components/Sidebar';
 import { RegistrationForm } from './components/RegistrationForm';
 import { ThankYouView } from './components/ThankYouView';
-import { AdminDashboard } from './components/AdminDashboard';
 import { StudentProfileCard } from './components/StudentProfileCard';
 import { LoginModal } from './components/LoginModal';
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState('register'); // 'register' | 'thankyou' | 'profile' | 'dashboard' | 'login'
+  const [activeTab, setActiveTab] = useState('register'); // 'register' | 'thankyou' | 'profile' | 'login'
   const [submittedData, setSubmittedData] = useState(null);
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
 
-  // Redirect after sign in if currently on login screen
+  // Redirect to profile after sign in if on login screen
   useEffect(() => {
     if (user && activeTab === 'login') {
-      if (isAdmin) {
-        setActiveTab('dashboard');
-      } else {
-        setActiveTab('profile');
-      }
+      setActiveTab('profile');
     }
-  }, [user, isAdmin, activeTab]);
+  }, [user, activeTab]);
 
   const handleRegistrationSuccess = (data) => {
     setSubmittedData(data);
@@ -58,17 +53,12 @@ function AppContent() {
           user ? (
             <StudentProfileCard
               onOpenRegistration={() => setActiveTab('register')}
-              onOpenDashboard={() => setActiveTab('dashboard')}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center py-12 px-4">
               <LoginModal onClose={() => setActiveTab('register')} />
             </div>
           )
-        )}
-
-        {activeTab === 'dashboard' && (
-          <AdminDashboard onBack={() => setActiveTab('register')} />
         )}
 
         {activeTab === 'login' && !user && (
@@ -93,30 +83,16 @@ function AppContent() {
             Registration
           </button>
           {user ? (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('profile');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className={`hover:text-slate-800 underline transition-colors ${activeTab === 'profile' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
-              >
-                My Card
-              </button>
-              {isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab('dashboard');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className={`hover:text-slate-800 underline transition-colors ${activeTab === 'dashboard' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
-                >
-                  Admin
-                </button>
-              )}
-            </>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('profile');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`hover:text-slate-800 underline transition-colors ${activeTab === 'profile' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+            >
+              My Card
+            </button>
           ) : (
             <button
               type="button"

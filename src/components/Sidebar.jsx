@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Shield, ArrowLeft, User, LogIn, LogOut } from 'lucide-react';
+import { ArrowLeft, User, LogIn, LogOut } from 'lucide-react';
 
 export const Sidebar = ({ activeTab, setActiveTab }) => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="w-full bg-slate-900 text-white border-b-2 border-amber-500 shadow-md sticky top-0 z-40">
@@ -29,18 +29,6 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
           {/* Navigation buttons based on auth state */}
           {user ? (
             <>
-              {/* If Admin, allow switching to Admin Dashboard */}
-              {isAdmin && activeTab !== 'dashboard' && (
-                <button
-                  type="button"
-                  onClick={() => setActiveTab && setActiveTab('dashboard')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white border border-white/15 transition-colors shadow-xs"
-                >
-                  <Shield className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Admin Dashboard</span>
-                  <span className="sm:hidden">Admin</span>
-                </button>
-              )}
 
               {/* Profile Card link */}
               {activeTab !== 'profile' && (
