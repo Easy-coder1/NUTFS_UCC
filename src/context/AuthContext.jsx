@@ -10,31 +10,30 @@ export const AuthProvider = ({ children }) => {
   const [adminChecking, setAdminChecking] = useState(false);
 
   const checkAdminStatus = async (currentUser) => {
-    if (!currentUser?.email) {
+    if (!currentUser?.id) {
       setIsAdmin(false);
       return false;
     }
 
     setAdminChecking(true);
     try {
-      // 1. Check custom claims / metadata
-      if (
-        currentUser.app_metadata?.role === 'admin' ||
-        currentUser.user_metadata?.role === 'admin' ||
-        currentUser.user_metadata?.is_admin === true
-      ) {
+      // Primary: check students.role column by auth user id
+      const { data, error } = await supabase
+        .from('students')
+        .select('role')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      if (!error && data?.role === 'admin') {
         setIsAdmin(true);
         return true;
       }
 
-      // 2. Check public.admin_users table (if table exists)
-      const { data, error } = await supabase
-        .from('admin_users')
-        .select('email')
-        .eq('email', currentUser.email)
-        .maybeSingle();
-
-      if (!error && data?.email) {
+      // Fallback: check app_metadata / user_metadata claims
+      if (
+        currentUser.app_metadata?.role === 'admin' ||
+        currentUser.user_metadata?.role === 'admin'
+      ) {
         setIsAdmin(true);
         return true;
       }
