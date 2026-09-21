@@ -21,6 +21,7 @@ export const LoginModal = ({ onClose }) => {
     setIsLoading(true);
     try {
       await signIn(email.trim(), password.trim());
+      if (onClose) onClose();
     } catch (err) {
       setError(err.message || 'Invalid login credentials. Please try again.');
     } finally {
@@ -42,8 +43,8 @@ export const LoginModal = ({ onClose }) => {
         )}
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-slate-900 font-sans">Admin Sign In</h2>
-          <p className="text-sm text-slate-500 mt-1">Sign in to access student management</p>
+          <h2 className="text-xl font-semibold text-slate-900 font-sans">Portal Sign In</h2>
+          <p className="text-sm text-slate-500 mt-1">Sign in with your email to view your member card or manage portal</p>
         </div>
 
         {error && (

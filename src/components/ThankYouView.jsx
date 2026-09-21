@@ -2,7 +2,8 @@ import React from 'react';
 import { 
   CheckCircle2, 
   UserPlus, 
-  User 
+  User,
+  Printer
 } from 'lucide-react';
 
 export const ThankYouView = ({ submittedData, onReset }) => {
@@ -99,8 +100,18 @@ export const ThankYouView = ({ submittedData, onReset }) => {
       {/* Trailing Actions */}
       <div className="flex justify-center items-center gap-3 no-print">
         <button
+          type="button"
+          onClick={() => window.print()}
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 transition-colors shadow-xs"
+        >
+          <Printer className="w-3.5 h-3.5" />
+          <span>Print Slip / Card</span>
+        </button>
+
+        <button
+          type="button"
           onClick={onReset}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-medium hover:bg-slate-800 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-colors"
         >
           <UserPlus className="w-3.5 h-3.5" />
           <span>Register Another Member</span>

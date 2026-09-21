@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { StudentProvider } from './context/StudentContext';
 import { Sidebar } from './components/Sidebar';
 import { RegistrationForm } from './components/RegistrationForm';
 import { ThankYouView } from './components/ThankYouView';
 import { AdminDashboard } from './components/AdminDashboard';
+import { StudentProfileCard } from './components/StudentProfileCard';
+import { LoginModal } from './components/LoginModal';
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState('register');
+  const [activeTab, setActiveTab] = useState('register'); // 'register' | 'thankyou' | 'profile' | 'dashboard' | 'login'
   const [submittedData, setSubmittedData] = useState(null);
+  const { user, isAdmin } = useAuth();
+
+  // Redirect after sign in if currently on login screen
+  useEffect(() => {
+    if (user && activeTab === 'login') {
+      if (isAdmin) {
+        setActiveTab('dashboard');
+      } else {
+        setActiveTab('profile');
+      }
+    }
+  }, [user, isAdmin, activeTab]);
 
   const handleRegistrationSuccess = (data) => {
     setSubmittedData(data);
@@ -40,24 +54,82 @@ function AppContent() {
           />
         )}
 
+        {activeTab === 'profile' && (
+          user ? (
+            <StudentProfileCard
+              onOpenRegistration={() => setActiveTab('register')}
+              onOpenDashboard={() => setActiveTab('dashboard')}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center py-12 px-4">
+              <LoginModal onClose={() => setActiveTab('register')} />
+            </div>
+          )
+        )}
+
         {activeTab === 'dashboard' && (
           <AdminDashboard onBack={() => setActiveTab('register')} />
+        )}
+
+        {activeTab === 'login' && !user && (
+          <div className="flex-1 flex items-center justify-center py-12 px-4">
+            <LoginModal onClose={() => setActiveTab('register')} />
+          </div>
         )}
       </main>
 
       {/* Footer */}
       <footer className="w-full border-t border-slate-200/80 py-4 px-6 mt-auto no-print text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between max-w-4xl mx-auto">
         <span>© {new Date().getFullYear()} NUTFS UCC Student Registration Portal • University of Cape Coast</span>
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab(activeTab === 'dashboard' ? 'register' : 'dashboard');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          className="text-slate-500 hover:text-slate-800 underline text-xs mt-2 sm:mt-0 transition-colors"
-        >
-          {activeTab === 'dashboard' ? '← Member Registration' : 'Admin Portal Sign In'}
-        </button>
+        <div className="flex items-center gap-4 mt-2 sm:mt-0">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('register');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`hover:text-slate-800 underline transition-colors ${activeTab === 'register' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+          >
+            Registration
+          </button>
+          {user ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('profile');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`hover:text-slate-800 underline transition-colors ${activeTab === 'profile' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+              >
+                My Card
+              </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('dashboard');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`hover:text-slate-800 underline transition-colors ${activeTab === 'dashboard' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+                >
+                  Admin
+                </button>
+              )}
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('login');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="text-slate-500 hover:text-slate-800 underline transition-colors"
+            >
+              Sign In
+            </button>
+          )}
+        </div>
       </footer>
     </div>
   );
