@@ -13,9 +13,9 @@ function AppContent() {
   const [submittedData, setSubmittedData] = useState(null);
   const { user, isAdmin } = useAuth();
 
-  // Redirect to profile after sign in; redirect admins to dashboard
+  // Redirect to profile/dashboard if logged in and trying to access login or register
   useEffect(() => {
-    if (user && activeTab === 'login') {
+    if (user && (activeTab === 'login' || activeTab === 'register')) {
       setActiveTab(isAdmin ? 'admin' : 'profile');
     }
   }, [user, isAdmin, activeTab]);
@@ -28,7 +28,7 @@ function AppContent() {
 
   const handleReset = () => {
     setSubmittedData(null);
-    setActiveTab('register');
+    setActiveTab(user ? (isAdmin ? 'admin' : 'profile') : 'register');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -40,7 +40,11 @@ function AppContent() {
       {/* Main Content Area */}
       <main className="flex-1">
         {activeTab === 'register' && (
-          <RegistrationForm onSuccess={handleRegistrationSuccess} />
+          user ? (
+            isAdmin ? <AdminDashboard /> : <StudentProfileCard />
+          ) : (
+            <RegistrationForm onSuccess={handleRegistrationSuccess} />
+          )
         )}
 
         {activeTab === 'thankyou' && (
@@ -81,40 +85,58 @@ function AppContent() {
       {/* Footer */}
       <footer className="w-full border-t border-slate-200/80 py-4 px-4 sm:px-6 mt-auto no-print text-center text-xs text-slate-400">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="text-center sm:text-left">© {new Date().getFullYear()} NUTFS UCC Student Registration Portal • University of Cape Coast</span>
+          <span className="text-center sm:text-left">
+            © {new Date().getFullYear()} NUTFS UCC {user ? 'Student Portal' : 'Student Registration Portal'} • University of Cape Coast
+          </span>
           <div className="flex items-center gap-3 sm:gap-4">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('register');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className={`hover:text-slate-800 underline transition-colors ${activeTab === 'register' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
-          >
-            Registration
-          </button>
-          {user ? (
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('profile');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`hover:text-slate-800 underline transition-colors ${activeTab === 'profile' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
-            >
-              Student Page
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('login');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="text-slate-500 hover:text-slate-800 underline transition-colors"
-            >
-              Sign In
-            </button>
+            {!user ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('register');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`hover:text-slate-800 underline transition-colors ${activeTab === 'register' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+                >
+                  Registration
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('login');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="text-slate-500 hover:text-slate-800 underline transition-colors"
+                >
+                  Sign In
+                </button>
+              </>
+            ) : (
+              <>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('admin');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`hover:text-slate-800 underline transition-colors ${activeTab === 'admin' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+                  >
+                    Admin Panel
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('profile');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`hover:text-slate-800 underline transition-colors ${activeTab === 'profile' ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}
+                >
+                  Student Page
+                </button>
+              </>
             )}
           </div>
         </div>

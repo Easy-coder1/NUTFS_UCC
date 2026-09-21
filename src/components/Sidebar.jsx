@@ -9,7 +9,14 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
     <header className="w-full bg-slate-900 text-white border-b-2 border-amber-500 shadow-md sticky top-0 z-40">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
         <div
-          onClick={() => setActiveTab && setActiveTab('register')}
+          onClick={() => {
+            if (!setActiveTab) return;
+            if (user) {
+              setActiveTab(isAdmin ? 'admin' : 'profile');
+            } else {
+              setActiveTab('register');
+            }
+          }}
           className="flex items-center gap-2 cursor-pointer select-none min-w-0"
         >
           <div className="h-8 sm:h-9 px-2 rounded-md bg-white/10 border border-white/20 flex items-center justify-center text-amber-400 font-bold text-xs tracking-wider shadow-xs shrink-0">
@@ -20,7 +27,7 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
               NUTFS UCC
             </span>
             <span className="text-[10px] sm:text-[11px] text-slate-300 block font-sans tracking-wide hidden sm:block">
-              Fellowship Registration Portal • UCC Chapter
+              {user ? 'Fellowship Student Portal • UCC Chapter' : 'Fellowship Registration Portal • UCC Chapter'}
             </span>
           </div>
         </div>
@@ -29,7 +36,6 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
           {/* Navigation buttons based on auth state */}
           {user ? (
             <>
-
               {/* Admin Panel link */}
               {isAdmin && activeTab !== 'admin' && (
                 <button
@@ -53,18 +59,6 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
                   <User className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Student Page</span>
                   <span className="sm:hidden">Profile</span>
-                </button>
-              )}
-
-              {/* Form link if on another tab */}
-              {activeTab !== 'register' && (
-                <button
-                  type="button"
-                  onClick={() => setActiveTab && setActiveTab('register')}
-                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-slate-200 hover:bg-white/20 hover:text-white border border-white/15 transition-colors shadow-xs"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Register</span>
                 </button>
               )}
 
