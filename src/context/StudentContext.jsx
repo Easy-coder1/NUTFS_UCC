@@ -239,19 +239,40 @@ export const StudentProvider = ({ children }) => {
         row.passport_photo_url = photoUrl;
       }
 
-      if (updatedFields.email) {
-        row.email = updatedFields.email;
+      const cleanEmail = (updatedFields.email || '').trim().toLowerCase();
+      if (cleanEmail) {
+        row.email = cleanEmail;
       }
 
-      let { error: updateError } = await supabase
-        .from('students')
-        .update(row)
-        .eq('id', id);
+      let updateError = null;
+
+      // Try updating by id first if valid
+      if (id) {
+        const res = await supabase
+          .from('students')
+          .update(row)
+          .eq('id', id);
+        updateError = res.error;
+      }
+
+      // If id update failed or id wasn't present, match by email
+      if ((!id || updateError) && cleanEmail) {
+        const retryByEmail = await supabase
+          .from('students')
+          .update(row)
+          .ilike('email', cleanEmail);
+        updateError = retryByEmail.error;
+      }
 
       if (updateError && updateError.message && updateError.message.toLowerCase().includes('email')) {
         delete row.email;
-        const retryResult = await supabase.from('students').update(row).eq('id', id);
-        updateError = retryResult.error;
+        if (id) {
+          const retryResult = await supabase.from('students').update(row).eq('id', id);
+          updateError = retryResult.error;
+        } else if (cleanEmail) {
+          const retryResult = await supabase.from('students').update(row).ilike('email', cleanEmail);
+          updateError = retryResult.error;
+        }
       }
 
       if (updateError) throw updateError;
@@ -262,7 +283,7 @@ export const StudentProvider = ({ children }) => {
         passportPhoto: photoUrl || updatedFields.passportPhoto || '',
       };
 
-      setStudents((prev) => prev.map((s) => s.id === id ? { ...s, ...updated } : s));
+      setStudents((prev) => prev.map((s) => (s.id === id || (cleanEmail && s.email?.toLowerCase() === cleanEmail)) ? { ...s, ...updated } : s));
       return updated;
     } catch (err) {
       console.error('Error updating student:', err);

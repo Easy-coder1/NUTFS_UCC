@@ -20,7 +20,7 @@ export const LoginModal = ({ onClose }) => {
 
     setIsLoading(true);
     try {
-      await signIn(email.trim(), password.trim());
+      await signIn(email.trim().toLowerCase(), password.trim());
       if (onClose) onClose();
     } catch (err) {
       setError(err.message || 'Invalid login credentials. Please try again.');
@@ -63,7 +63,7 @@ export const LoginModal = ({ onClose }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@nutfs-ucc.org"
+              placeholder="e.g. member@ucc.edu.gh or kwame@gmail.com"
               autoComplete="email"
               className="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-slate-400"
             />

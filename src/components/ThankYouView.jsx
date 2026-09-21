@@ -106,7 +106,7 @@ export const ThankYouView = ({ submittedData, onReset, onViewCard }) => {
             className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-500 text-slate-900 rounded-lg text-xs font-semibold hover:bg-amber-400 transition-colors shadow-xs"
           >
             <User className="w-3.5 h-3.5" />
-            <span>View My Card & Edit</span>
+            <span>Go to My Student Page</span>
           </button>
         )}
 
