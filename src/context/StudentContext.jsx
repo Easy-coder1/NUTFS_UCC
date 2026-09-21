@@ -212,6 +212,65 @@ export const StudentProvider = ({ children }) => {
     document.body.removeChild(link);
   };
 
+  // Update an existing student
+  const updateStudent = async (id, updatedFields, newPhotoFile = null) => {
+    setError(null);
+    try {
+      let photoUrl = updatedFields.passportPhoto || '';
+
+      // If a new File object is provided, upload it to Storage
+      if (newPhotoFile instanceof File) {
+        photoUrl = await uploadPassportPhoto(newPhotoFile);
+      }
+
+      const row = {
+        full_name: updatedFields.fullName,
+        phone: updatedFields.phone,
+        program_of_study: updatedFields.programOfStudy,
+        level: updatedFields.level,
+        hall_of_affiliation: updatedFields.hallOfAffiliation,
+        residence_type: updatedFields.residenceType,
+        room_number: updatedFields.residenceType === 'Hall' 
+          ? (updatedFields.roomNumber || '') 
+          : (updatedFields.hostelName || updatedFields.roomNumber || ''),
+      };
+
+      if (photoUrl) {
+        row.passport_photo_url = photoUrl;
+      }
+
+      if (updatedFields.email) {
+        row.email = updatedFields.email;
+      }
+
+      let { error: updateError } = await supabase
+        .from('students')
+        .update(row)
+        .eq('id', id);
+
+      if (updateError && updateError.message && updateError.message.toLowerCase().includes('email')) {
+        delete row.email;
+        const retryResult = await supabase.from('students').update(row).eq('id', id);
+        updateError = retryResult.error;
+      }
+
+      if (updateError) throw updateError;
+
+      const updated = {
+        ...updatedFields,
+        id,
+        passportPhoto: photoUrl || updatedFields.passportPhoto || '',
+      };
+
+      setStudents((prev) => prev.map((s) => s.id === id ? { ...s, ...updated } : s));
+      return updated;
+    } catch (err) {
+      console.error('Error updating student:', err);
+      setError(err.message);
+      throw err;
+    }
+  };
+
   return (
     <StudentContext.Provider
       value={{
@@ -219,6 +278,8 @@ export const StudentProvider = ({ children }) => {
         loading,
         error,
         addStudent,
+        updateStudent,
+        uploadPassportPhoto,
         deleteStudent,
         exportToCSV,
         refetch: fetchStudents

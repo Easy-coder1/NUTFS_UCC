@@ -46,6 +46,7 @@ function AppContent() {
           <ThankYouView
             submittedData={submittedData}
             onReset={handleReset}
+            onViewCard={() => setActiveTab('profile')}
           />
         )}
 
