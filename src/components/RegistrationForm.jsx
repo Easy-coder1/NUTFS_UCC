@@ -389,9 +389,8 @@ export const RegistrationForm = ({ onSuccess }) => {
                   </p>
                 )}
               </div>
-
-
-
+              {/* Account Credentials / Login Setup */}
+              <div className="sm:col-span-2 pt-2 border-t border-slate-200/80 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Email */}
                   <div className="sm:col-span-2">
