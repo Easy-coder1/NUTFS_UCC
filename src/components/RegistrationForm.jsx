@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { HALLS_OF_AFFILIATION, LEVELS, DEGREE_TYPES } from '../constants/data';
 import { useStudents } from '../context/StudentContext';
+import { supabase } from '../lib/supabase';
 import { 
   Upload, 
   Send, 
@@ -9,7 +10,10 @@ import {
   Loader2,
   ShieldCheck,
   CheckSquare,
-  Square
+  Square,
+  Mail,
+  Lock,
+  KeyRound
 } from 'lucide-react';
 
 export const RegistrationForm = ({ onSuccess }) => {
@@ -20,6 +24,10 @@ export const RegistrationForm = ({ onSuccess }) => {
     firstName: '',
     lastName: '',
     phone: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    createAccount: false,
     degreeType: DEGREE_TYPES[0],
     programName: '',
     level: '100',
@@ -122,6 +130,26 @@ export const RegistrationForm = ({ onSuccess }) => {
       newErrors.hostelName = 'Hostel name is required for Hostel residents.';
     }
 
+    if (formData.createAccount) {
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email address is required for account creation.';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+        newErrors.email = 'Please enter a valid email address.';
+      }
+
+      if (!formData.password) {
+        newErrors.password = 'Password is required.';
+      } else if (formData.password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters.';
+      }
+
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = 'Confirm password is required.';
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match.';
+      }
+    }
+
     if (!isDeclared) {
       newErrors.declaration = 'You must certify the declaration before submitting.';
     }
@@ -145,8 +173,31 @@ export const RegistrationForm = ({ onSuccess }) => {
 
       const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
 
+      // If requested, create account credentials in Supabase Auth
+      if (formData.createAccount && formData.email && formData.password) {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: formData.email.trim(),
+          password: formData.password,
+          options: {
+            data: {
+              full_name: fullName,
+              phone: formData.phone.trim()
+            }
+          }
+        });
+
+        if (signUpError) {
+          // If the user is already registered in Auth, provide friendly feedback
+          if (signUpError.message?.toLowerCase().includes('already registered')) {
+            throw new Error('This email is already registered. You can use it to sign in directly.');
+          }
+          throw new Error(`Account setup error: ${signUpError.message}`);
+        }
+      }
+
       const created = await addStudent({
         fullName,
+        email: formData.createAccount ? formData.email.trim() : (formData.email?.trim() || ''),
         phone: formData.phone.trim(),
         programOfStudy: fullProgram,
         level: formData.level,
@@ -344,6 +395,118 @@ export const RegistrationForm = ({ onSuccess }) => {
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.level}
                   </p>
                 )}
+              </div>
+
+              {/* Account Credentials / Admin Option */}
+              <div className="sm:col-span-2 pt-2">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={formData.createAccount}
+                        onChange={(e) => handleInputChange('createAccount', e.target.checked)}
+                        className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 accent-slate-900"
+                      />
+                      <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <KeyRound className="w-3.5 h-3.5 text-amber-600" />
+                        Create Portal Account / Admin Access (Optional)
+                      </span>
+                    </label>
+                    <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-600">
+                      Optional
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-500">
+                    Enable this option if you are an administrator, executive, or student who needs login credentials for the portal.
+                  </p>
+
+                  {formData.createAccount && (
+                    <div className="pt-3 border-t border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Email */}
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Email Address <span className="text-red-600">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            placeholder="e.g. member@ucc.edu.gh or kwame@gmail.com"
+                            autoComplete="email"
+                            className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                              errors.email
+                                ? 'border-red-500 bg-red-50/20'
+                                : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                            }`}
+                          />
+                          <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        </div>
+                        {errors.email && (
+                          <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5" /> {errors.email}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Password */}
+                      <div className="sm:col-span-1">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Create Password <span className="text-red-600">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="password"
+                            value={formData.password}
+                            onChange={(e) => handleInputChange('password', e.target.value)}
+                            placeholder="Min. 6 characters"
+                            autoComplete="new-password"
+                            className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                              errors.password
+                                ? 'border-red-500 bg-red-50/20'
+                                : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                            }`}
+                          />
+                          <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        </div>
+                        {errors.password && (
+                          <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5" /> {errors.password}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Confirm Password */}
+                      <div className="sm:col-span-1">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Confirm Password <span className="text-red-600">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                            placeholder="Re-enter password"
+                            autoComplete="new-password"
+                            className={`w-full pl-9 pr-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none transition-colors ${
+                              errors.confirmPassword
+                                ? 'border-red-500 bg-red-50/20'
+                                : 'border-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900'
+                            }`}
+                          />
+                          <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        </div>
+                        {errors.confirmPassword && (
+                          <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5" /> {errors.confirmPassword}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

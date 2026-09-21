@@ -5,17 +5,65 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [adminChecking, setAdminChecking] = useState(false);
+
+  const checkAdminStatus = async (currentUser) => {
+    if (!currentUser?.email) {
+      setIsAdmin(false);
+      return false;
+    }
+
+    setAdminChecking(true);
+    try {
+      // 1. Check custom claims / metadata
+      if (
+        currentUser.app_metadata?.role === 'admin' ||
+        currentUser.user_metadata?.role === 'admin' ||
+        currentUser.user_metadata?.is_admin === true
+      ) {
+        setIsAdmin(true);
+        return true;
+      }
+
+      // 2. Check public.admin_users table (if table exists)
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('email')
+        .eq('email', currentUser.email)
+        .maybeSingle();
+
+      if (!error && data?.email) {
+        setIsAdmin(true);
+        return true;
+      }
+
+      setIsAdmin(false);
+      return false;
+    } catch (err) {
+      console.warn('Admin check notice:', err.message);
+      setIsAdmin(false);
+      return false;
+    } finally {
+      setAdminChecking(false);
+    }
+  };
 
   useEffect(() => {
     // Check active session on mount
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          await checkAdminStatus(currentUser);
+        }
       } catch (error) {
         console.error('Error getting session:', error);
         setUser(null);
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }
@@ -25,8 +73,14 @@ export const AuthProvider = ({ children }) => {
 
     // Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
+      async (_event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          await checkAdminStatus(currentUser);
+        } else {
+          setIsAdmin(false);
+        }
         setLoading(false);
       }
     );
@@ -42,6 +96,9 @@ export const AuthProvider = ({ children }) => {
       password,
     });
     if (error) throw error;
+    if (data?.user) {
+      await checkAdminStatus(data.user);
+    }
     return data;
   };
 
@@ -49,10 +106,23 @@ export const AuthProvider = ({ children }) => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     setUser(null);
+    setIsAdmin(false);
   };
 
+  const refreshAdminStatus = () => checkAdminStatus(user);
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAdmin,
+        adminChecking,
+        loading,
+        signIn,
+        signOut,
+        refreshAdminStatus
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
