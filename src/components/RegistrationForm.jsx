@@ -12,8 +12,7 @@ import {
   CheckSquare,
   Square,
   Mail,
-  Lock,
-  KeyRound
+  Lock
 } from 'lucide-react';
 
 export const RegistrationForm = ({ onSuccess }) => {
@@ -391,17 +390,7 @@ export const RegistrationForm = ({ onSuccess }) => {
                 )}
               </div>
 
-              {/* Account Credentials / Login Setup */}
-              <div className="sm:col-span-2 pt-2 border-t border-slate-200/80 space-y-4">
-                <div className="flex items-center gap-2">
-                  <KeyRound className="w-4 h-4 text-amber-600" />
-                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    Portal Login Credentials
-                  </span>
-                  <span className="text-[11px] text-slate-500 font-normal">
-                    (Used to sign in and view your member slip & profile card)
-                  </span>
-                </div>
+
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Email */}
